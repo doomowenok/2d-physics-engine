@@ -1,9 +1,9 @@
 #include "Vec2.h"
 #include <math.h>
 
-Vec2::Vec2(): x(0.0), y(0.0) {}
+Vec2::Vec2(): x(0.0), y(0.0) { }
 
-Vec2::Vec2(float x, float y): x(x), y(y) {}
+Vec2::Vec2(float x, float y): x(x), y(y) { }
 
 void Vec2::Add(const Vec2& v)
 {
@@ -81,85 +81,85 @@ float Vec2::Cross(const Vec2& v) const
 
 Vec2& Vec2::operator = (const Vec2& v)
 {
-    x = v.x;
-    y = v.y;
-    return *this;
+	x = v.x;
+	y = v.y;
+	return *this;
 }
 
 bool Vec2::operator == (const Vec2& v) const
 {
-    return x == v.x && y == v.y;
+	return x == v.x && y == v.y;
 }
 
 bool Vec2::operator != (const Vec2& v) const
 {
-    return !(*this == v);
+	return !(*this == v);
 }
 
 Vec2 Vec2::operator + (const Vec2& v) const
 {
-    Vec2 result;
-    result.x = x + v.x;
-    result.y = y + v.y;
-    return result;
+	Vec2 result;
+	result.x = x + v.x;
+	result.y = y + v.y;
+	return result;
 }
 
 Vec2 Vec2::operator - (const Vec2& v) const
 {
-    Vec2 result;
-    result.x = x - v.x;
-    result.y = y - v.y;
-    return result;
+	Vec2 result;
+	result.x = x - v.x;
+	result.y = y - v.y;
+	return result;
 }
 
 Vec2 Vec2::operator * (const float n) const
 {
-    Vec2 result;
-    result.x = x * n;
-    result.y = y * n;
-    return result;
+	Vec2 result;
+	result.x = x * n;
+	result.y = y * n;
+	return result;
 }
 
 Vec2 Vec2::operator / (const float n) const
 {
-    Vec2 result;
-    result.x = x / n;
-    result.y = y / n;
-    return result;
+	Vec2 result;
+	result.x = x / n;
+	result.y = y / n;
+	return result;
 }
 
-Vec2 Vec2::operator - () const
+Vec2& Vec2::operator += (const Vec2& v)
 {
-    Vec2 result;
-    result.x = -x;
-    result.y = -y;
-    return result;
+	x += v.x;
+	y += v.y;
+	return *this;
 }
 
-Vec2 Vec2::operator += (const Vec2& v)
+Vec2& Vec2::operator -= (const Vec2& v)
 {
-    x += v.x;
-    y += v.y;
+	x -= v.x;
+	y -= v.y;
+	return *this;
+}
+
+Vec2& Vec2::operator *= (const float n)
+{
+	x *= n;
+	y *= n;
     return *this;
 }
 
-Vec2 Vec2::operator -= (const Vec2& v)
+Vec2& Vec2::operator /= (const float n)
 {
-    x += v.x;
-    y += v.y;
+	x /= n;
+	y /= n;
     return *this;
 }
 
-Vec2 Vec2::operator*=(float n)
+Vec2 Vec2::operator - ()
 {
-    x *= n;
-    y *= n;
-    return *this;
-}
-
-Vec2 Vec2::operator/=(float n)
-{
-    x /= n;
-    y /= n;
-    return *this;
+	Vec2 result;
+	result.x = x * -1;
+	result.y = y * -1;
+	return result;
 }

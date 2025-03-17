@@ -1,9 +1,19 @@
-#include <iostream>
-#include "Vec2.h"
+#include "Application.h"
 
-int main()
+int main(int argc, char *args[])
 {
-    Vec2 v = Vec2(10, 10);
-    std::cout << v.x << " " << v.y << std::endl;
+    Application app;
+
+    app.Setup();
+
+    while (app.IsRunning())
+    {
+        app.Input();
+        app.Update();
+        app.Render();
+    }
+
+    app.Destroy();
+
     return 0;
 }
