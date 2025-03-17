@@ -1,6 +1,7 @@
 #pragma once
 
-struct Vec2 {
+struct Vec2
+{
     float x;
     float y;
 
@@ -23,4 +24,19 @@ struct Vec2 {
 
     float Dot(const Vec2& v) const;          // v1.Dot(v2)
     float Cross(const Vec2& v) const;        // v1.Cross(v2)
+
+    Vec2& operator = (const Vec2& v);
+    bool operator == (const Vec2& v) const;
+    bool operator != (const Vec2& v) const;
+
+    Vec2 operator + (const Vec2& v) const;
+    Vec2 operator - (const Vec2& v) const;
+    Vec2 operator * (float n) const;
+    Vec2 operator / (float n) const;
+    Vec2 operator - () const;
+
+    Vec2 operator += (const Vec2& v);
+    Vec2 operator -= (const Vec2& v);
+    Vec2 operator *= (float n);
+    Vec2 operator /= (float n);
 };
