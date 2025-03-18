@@ -1,4 +1,5 @@
 #include "Application.h"
+#include "Physics/Constants.h"
 
 bool Application::IsRunning()
 {
@@ -34,7 +35,25 @@ void Application::Input()
 
 void Application::Update()
 {
-    particle->Velocity = Vec2(2.0f, 0.0f);
+    static int timePreviousFrame;
+
+    int timeToWait = MILLISECONDS_PER_FRAME - (SDL_GetTicks() - timePreviousFrame);
+
+    if(timeToWait > 0)
+    {
+        SDL_Delay(timeToWait);
+    }
+
+    float deltaTime = (float)(SDL_GetTicks() - timePreviousFrame) / MILLISECONDS_IN_SECOND;
+
+    if(deltaTime > 0.016)
+    {
+        deltaTime = 0.016;
+    }
+
+    timePreviousFrame = SDL_GetTicks();
+
+    particle->Velocity = Vec2(50.0f, 10.0f) * deltaTime;
 
     particle->Position += particle->Velocity;
 }
@@ -42,14 +61,12 @@ void Application::Update()
 void Application::Render()
 {
     Graphics::ClearScreen(0xFF056263);
-    Graphics::DrawFillCircle(particle->Position.x, particle->Position.y, 4, 0xFFFFFFFF);
+    Graphics::DrawFillCircle((int)particle->Position.x, (int)particle->Position.y, 4, 0xFFFFFFFF);
     Graphics::RenderFrame();
 }
 
 void Application::Destroy()
 {
-    // TODO: destroy all objects in the scene
-
     delete particle;
     Graphics::CloseWindow();
 }

@@ -7,7 +7,7 @@ class Application
 {
     private:
         bool running = false;
-        Particle* particle;
+        Particle* particle = nullptr;
 
     public:
         Application() = default;
