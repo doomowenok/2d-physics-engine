@@ -9,7 +9,7 @@ void Application::Setup()
 {
     running = Graphics::OpenWindow();
 
-    // TODO: setup objects in the scene
+    particle = new Particle(50, 100, 1.0f);
 }
 
 void Application::Input()
@@ -34,13 +34,15 @@ void Application::Input()
 
 void Application::Update()
 {
-    // TODO: update all objects in the scene
+    particle->Velocity = Vec2(2.0f, 0.0f);
+
+    particle->Position += particle->Velocity;
 }
 
 void Application::Render()
 {
     Graphics::ClearScreen(0xFF056263);
-    Graphics::DrawFillCircle(200, 200, 40, 0xFFFFFFFF);
+    Graphics::DrawFillCircle(particle->Position.x, particle->Position.y, 4, 0xFFFFFFFF);
     Graphics::RenderFrame();
 }
 
@@ -48,5 +50,6 @@ void Application::Destroy()
 {
     // TODO: destroy all objects in the scene
 
+    delete particle;
     Graphics::CloseWindow();
 }
