@@ -8,8 +8,9 @@ struct Particle
     Vec2 Velocity;
     Vec2 Acceleration;
 
+    int Radius;
     float Mass;
 
-    Particle(float x, float y, float mass);
+    Particle(float x, float y, float mass, float radius);
     ~Particle();
 };
