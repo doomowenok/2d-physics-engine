@@ -2,12 +2,14 @@
 
 #include "Graphics.h"
 #include "Physics/Particle.h"
+#include <vector>
 
 class Application
 {
     private:
         bool running = false;
-        Particle* particle = nullptr;
+        std::vector<Particle*> particles;
+        Vec2 pushForce = Vec2(0.0f, 0.0f);
 
     public:
         Application() = default;

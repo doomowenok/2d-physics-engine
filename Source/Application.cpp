@@ -11,7 +11,11 @@ void Application::Setup()
 {
     running = Graphics::OpenWindow();
 
-    particle = new Particle(50, 100, 1.0f, 4);
+    Particle* smallBall = new Particle(50, 100, 1.0f, 4);
+    particles.push_back(smallBall);
+
+//    Particle* bigBall = new Particle(200, 100, 4.0f, 16);
+//    particles.push_back(bigBall);
 }
 
 void Application::Input()
@@ -28,6 +32,40 @@ void Application::Input()
                 if (event.key.keysym.sym == SDLK_ESCAPE)
                 {
                     running = false;
+                }
+                if(event.key.keysym.sym == SDLK_UP)
+                {
+                    pushForce.y = 50.0 * PIXELS_PER_METER;
+                }
+                if(event.key.keysym.sym == SDLK_RIGHT)
+                {
+                    pushForce.x = 50.0 * PIXELS_PER_METER;
+                }
+                if(event.key.keysym.sym == SDLK_DOWN)
+                {
+                    pushForce.y = -50.0 * PIXELS_PER_METER;
+                }
+                if(event.key.keysym.sym == SDLK_LEFT)
+                {
+                    pushForce.x = -50.0 * PIXELS_PER_METER;
+                }
+                break;
+            case SDL_KEYUP:
+                if(event.key.keysym.sym == SDLK_UP)
+                {
+                    pushForce.y = 0.0f;
+                }
+                if(event.key.keysym.sym == SDLK_RIGHT)
+                {
+                    pushForce.x = 0.0f;
+                }
+                if(event.key.keysym.sym == SDLK_DOWN)
+                {
+                    pushForce.y = 0.0f;
+                }
+                if(event.key.keysym.sym == SDLK_LEFT)
+                {
+                    pushForce.x = 0.0f;
                 }
                 break;
         }
@@ -54,42 +92,73 @@ void Application::Update()
 
     timePreviousFrame = SDL_GetTicks();
 
-    particle->Acceleration = Vec2(2.0f, 9.8f) * PIXELS_PER_METER;
+    Vec2 wind = Vec2(1.0f, 0.0f) * PIXELS_PER_METER;
+    Vec2 weight = Vec2(0.0f, 9.8f) * PIXELS_PER_METER;
 
-    particle->Integrate(deltaTime);
-
-    if(particle->Position.x - particle->Radius <= 0)
+    for (Particle* particle : particles)
     {
-        particle->Position.x = particle->Radius;
-        particle->Velocity.x *= -1.0f;
-    }
-    else if(particle->Position.x + particle->Radius >= Graphics::Width())
-    {
-        particle->Position.x = Graphics::Width() - particle->Radius;
-        particle->Velocity.x *= -1.0f;
+        particle->AddForce(wind);
     }
 
-    if(particle->Position.y - particle->Radius <= 0)
+    for (Particle* particle : particles)
     {
-        particle->Position.y = particle->Radius;
-        particle->Velocity.y *= -1.0f;
+        particle->AddForce(weight * particle->Mass);
     }
-    else if(particle->Position.y + particle->Radius >= Graphics::Height())
+
+    for (Particle* particle : particles)
     {
-        particle->Position.y = Graphics::Height() - particle->Radius;
-        particle->Velocity.y *= -1.0f;
+        particle->AddForce(pushForce);
+    }
+
+    for (Particle* particle : particles)
+    {
+        particle->Integrate(deltaTime);
+    }
+
+    for (Particle* particle : particles)
+    {
+        if(particle->Position.x - particle->Radius <= 0)
+        {
+            particle->Position.x = particle->Radius;
+            particle->Velocity.x *= -0.9f;
+        }
+        else if(particle->Position.x + particle->Radius >= Graphics::Width())
+        {
+            particle->Position.x = Graphics::Width() - particle->Radius;
+            particle->Velocity.x *= -0.9f;
+        }
+
+        if(particle->Position.y - particle->Radius <= 0)
+        {
+            particle->Position.y = particle->Radius;
+            particle->Velocity.y *= -0.9f;
+        }
+        else if(particle->Position.y + particle->Radius >= Graphics::Height())
+        {
+            particle->Position.y = Graphics::Height() - particle->Radius;
+            particle->Velocity.y *= -0.9f;
+        }
     }
 }
 
 void Application::Render()
 {
     Graphics::ClearScreen(0xFF056263);
-    Graphics::DrawFillCircle((int)particle->Position.x, (int)particle->Position.y, particle->Radius, 0xFFFFFFFF);
+
+    for (Particle* particle : particles)
+    {
+        Graphics::DrawFillCircle((int)particle->Position.x, (int)particle->Position.y, particle->Radius, 0xFFFFFFFF);
+    }
+
     Graphics::RenderFrame();
 }
 
 void Application::Destroy()
 {
-    delete particle;
+    for (Particle* particle : particles)
+    {
+        delete particle;
+    }
+
     Graphics::CloseWindow();
 }
