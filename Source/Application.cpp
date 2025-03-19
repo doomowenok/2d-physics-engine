@@ -56,8 +56,7 @@ void Application::Update()
 
     particle->Acceleration = Vec2(2.0f, 9.8f) * PIXELS_PER_METER;
 
-    particle->Velocity += particle->Acceleration * deltaTime;
-    particle->Position += particle->Velocity * deltaTime;
+    particle->Integrate(deltaTime);
 
     if(particle->Position.x - particle->Radius <= 0)
     {

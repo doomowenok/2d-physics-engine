@@ -11,6 +11,8 @@ struct Particle
     int Radius;
     float Mass;
 
-    Particle(float x, float y, float mass, float radius);
+    Particle(float x, float y, float mass, int radius);
     ~Particle();
+
+    void Integrate(float deltaTime);
 };
