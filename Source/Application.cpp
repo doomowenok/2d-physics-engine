@@ -1,6 +1,7 @@
 #include "Application.h"
 #include "Physics/Constants.h"
 #include "Graphics.h"
+#include "Physics/Force.h"
 
 bool Application::IsRunning()
 {
@@ -14,8 +15,10 @@ void Application::Setup()
     Particle* smallBall = new Particle(50, 100, 1.0f, 4);
     particles.push_back(smallBall);
 
-//    Particle* bigBall = new Particle(200, 100, 4.0f, 16);
-//    particles.push_back(bigBall);
+    liquid.x = 0;
+    liquid.y = Graphics::Height() / 2;
+    liquid.w = Graphics::Width();
+    liquid.h = Graphics::Height() / 2;
 }
 
 void Application::Input()
@@ -98,16 +101,14 @@ void Application::Update()
     for (Particle* particle : particles)
     {
         particle->AddForce(wind);
-    }
-
-    for (Particle* particle : particles)
-    {
         particle->AddForce(weight * particle->Mass);
-    }
-
-    for (Particle* particle : particles)
-    {
         particle->AddForce(pushForce);
+
+        if(particle->Position.y >= liquid.y)
+        {
+            Vec2 drag = Force::GenerateDragForce(*particle, 0.01);
+            particle->AddForce(drag);
+        }
     }
 
     for (Particle* particle : particles)
@@ -144,6 +145,8 @@ void Application::Update()
 void Application::Render()
 {
     Graphics::ClearScreen(0xFF056263);
+
+    Graphics::DrawFillRect(liquid.x + liquid.w / 2, liquid.y + liquid.h / 2, liquid.w, liquid.h, 0xFF6E3713);
 
     for (Particle* particle : particles)
     {
