@@ -6,20 +6,27 @@
 
 class Application
 {
-    private:
-        bool running = false;
+private:
+    bool running = false;
+    std::vector<Particle*> particles;
+    Vec2 pushForce = Vec2(0.0f, 0.0f);
+    Vec2 mouseCursor = Vec2(0.0f, 0.0f);
+    bool leftMouseButtonDown = false;
 
-        std::vector<Particle*> particles;
-        Vec2 pushForce = Vec2(0.0f, 0.0f);
-        SDL_Rect liquid;
+public:
+    Application() = default;
 
-    public:
-        Application() = default;
-        ~Application() = default;
-        bool IsRunning();
-        void Setup();
-        void Input();
-        void Update();
-        void Render();
-        void Destroy();
+    ~Application() = default;
+
+    bool IsRunning();
+
+    void Setup();
+
+    void Input();
+
+    void Update();
+
+    void Render();
+
+    void Destroy();
 };
