@@ -12,11 +12,10 @@ void Application::Setup()
 {
     running = Graphics::OpenWindow();
 
-    Particle* smallPlanet = new Particle(200, 200, 1.0f, 6);
-    particles.push_back(smallPlanet);
+    anchor = Vec2(Graphics::Width() / 2.0f, 30);
 
-    Particle* bigPlanet = new Particle(500, 500, 200.0f, 20);
-    particles.push_back(bigPlanet);
+    Particle* bob = new Particle(Graphics::Width() / 2.0f, Graphics::Height() / 2.0f, 2.0f, 10);
+    particles.push_back(bob);
 }
 
 void Application::Input()
@@ -116,20 +115,19 @@ void Application::Update()
 
     timePreviousFrame = SDL_GetTicks();
 
-//    Vec2 weight = Vec2(0.0f, 9.8f) * PIXELS_PER_METER;
-
     for (Particle* particle: particles)
     {
-//        particle->AddForce(weight * particle->Mass);
         particle->AddForce(pushForce);
 
-        Vec2 friction = Force::GenerateFrictionForce(*particle, 20.0f);
-        particle->AddForce(friction);
+        Vec2 drag = Force::GenerateDragForce(*particle, 0.001f);
+        particle->AddForce(drag);
+
+        Vec2 weight = Vec2(0.0f, particle->Mass * 9.8f * PIXELS_PER_METER);
+        particle->AddForce(weight);
     }
 
-    Vec2 attraction = Force::GenerateGravitationalForce(*particles[0], *particles[1], 1000.0f, 5.0f, 100.0f);
-    particles[0]->AddForce(attraction);
-    particles[1]->AddForce(-attraction);
+    Vec2 springForce = Force::GenerateSpringForce(*particles[0], anchor, restLength, k);
+    particles[0]->AddForce(springForce);
 
     for (Particle* particle: particles)
     {
@@ -169,12 +167,14 @@ void Application::Render()
         Graphics::DrawLine(particles[0]->Position.x, particles[0]->Position.y, mouseCursor.x, mouseCursor.y,0xFF0000FF);
     }
 
-    int count = 0;
-    for (Particle* particle: particles)
-    {
-        Graphics::DrawFillCircle((int) particle->Position.x, (int) particle->Position.y, particle->Radius, count % 2 == 0 ? 0xFFAA3300 : 0xFF00FFFF);
-        count++;
-    }
+    // Spring
+    Graphics::DrawLine(anchor.x, anchor.y, particles[0]->Position.x, particles[0]->Position.y, 0xFF313131);
+
+    // Anchor
+    Graphics::DrawFillCircle(anchor.x, anchor.y, 5, 0xFF001155);
+
+    // Bob
+    Graphics::DrawFillCircle(particles[0]->Position.x, particles[0]->Position.y, particles[0]->Radius, 0xFFFFFFFF);
 
     Graphics::RenderFrame();
 }
