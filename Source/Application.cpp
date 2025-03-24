@@ -12,8 +12,11 @@ void Application::Setup()
 {
     running = Graphics::OpenWindow();
 
-    Particle* particle = new Particle(100, 100, 1.0f, 5);
-    particles.push_back(particle);
+    Particle* smallPlanet = new Particle(100, 100, 1.0f, 6);
+    particles.push_back(smallPlanet);
+
+    Particle* bigPlanet = new Particle(500, 500, 100000000.0f, 20);
+    particles.push_back(bigPlanet);
 }
 
 void Application::Input()
@@ -124,6 +127,10 @@ void Application::Update()
         particle->AddForce(friction);
     }
 
+    Vec2 attraction = Force::GenerateGravitationalForce(*particles[0], *particles[1], 1.0f);
+    particles[0]->AddForce(attraction);
+    particles[1]->AddForce(-attraction);
+
     for (Particle* particle: particles)
     {
         particle->Integrate(deltaTime);
@@ -159,13 +166,14 @@ void Application::Render()
 
     if (leftMouseButtonDown)
     {
-        Graphics::DrawLine(particles[0]->Position.x, particles[0]->Position.y, mouseCursor.x, mouseCursor.y,
-                           0xFF0000FF);
+        Graphics::DrawLine(particles[0]->Position.x, particles[0]->Position.y, mouseCursor.x, mouseCursor.y,0xFF0000FF);
     }
 
+    int count = 0;
     for (Particle* particle: particles)
     {
-        Graphics::DrawFillCircle((int) particle->Position.x, (int) particle->Position.y, particle->Radius, 0xFFFFFFFF);
+        Graphics::DrawFillCircle((int) particle->Position.x, (int) particle->Position.y, particle->Radius, count % 2 == 0 ? 0xFFAA3300 : 0xFF00FFFF);
+        count++;
     }
 
     Graphics::RenderFrame();
