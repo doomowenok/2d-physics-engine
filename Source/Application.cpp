@@ -14,10 +14,17 @@ void Application::Setup()
 
     anchor = Vec2(Graphics::Width() / 2.0f, 30.0f);
 
-    for (int i = 0; i < NUM_PARTICLES; i++)
-    {
-        particles.push_back(new Particle(anchor.x, anchor.y + restLength * i, 2, 6));
-    }
+//    // Chain
+//    for (int i = 0; i < NUM_PARTICLES; i++)
+//    {
+//        particles.push_back(new Particle(anchor.x, anchor.y + restLength * i, 2, 6));
+//    }
+
+    // Soft-body
+    particles.push_back(new Particle(100, 100, 2.0f, 6));
+    particles.push_back(new Particle(100 + restLength, 100, 2.0f, 6));
+    particles.push_back(new Particle(100 + restLength, 100 - restLength, 2.0f, 6));
+    particles.push_back(new Particle(100, 100 - restLength, 2.0f, 6));
 }
 
 void Application::Input()
@@ -88,7 +95,8 @@ void Application::Input()
                 if (leftMouseButtonDown && event.button.button == SDL_BUTTON_LEFT)
                 {
                     leftMouseButtonDown = false;
-                    int particleIndex = NUM_PARTICLES - 1;
+                    int particleIndex = 0;
+                    // int particleIndex = NUM_PARTICLES - 1;
                     Vec2 impulseDirection = (particles[particleIndex]->Position - mouseCursor).UnitVector();
                     float impulseMagnitude = (particles[particleIndex]->Position - mouseCursor).Magnitude() * 5.0;
                     particles[particleIndex]->Velocity = impulseDirection * impulseMagnitude;
@@ -120,22 +128,39 @@ void Application::Update()
 
     for (Particle* particle: particles)
     {
-        particle->AddForce(pushForce);
+        // particle->AddForce(pushForce);
 
-        Vec2 drag = Force::GenerateDragForce(*particle, 0.001f);
+        Vec2 drag = Force::GenerateDragForce(*particle, 0.003f);
         particle->AddForce(drag);
 
         Vec2 weight = Vec2(0.0f, particle->Mass * 9.8f * PIXELS_PER_METER);
         particle->AddForce(weight);
     }
 
-    particles[0]->AddForce(Force::GenerateSpringForce(*particles[0], anchor, restLength, k));
+//    // Chain
+//    particles[0]->AddForce(Force::GenerateSpringForce(*particles[0], anchor, restLength, k));
+//
+//    for (int i = 1; i < NUM_PARTICLES; i++)
+//    {
+//        Vec2 springForce = Force::GenerateSpringForce(*particles[i], *particles[i - 1], restLength, k);
+//        particles[i]->AddForce(springForce);
+//        particles[i - 1]->AddForce(-springForce);
+//    }
 
-    for (int i = 1; i < NUM_PARTICLES; i++)
+    // Soft-body
+    for (Particle* a : particles)
     {
-        Vec2 springForce = Force::GenerateSpringForce(*particles[i], *particles[i - 1], restLength, k);
-        particles[i]->AddForce(springForce);
-        particles[i - 1]->AddForce(-springForce);
+        for (Particle* b : particles)
+        {
+            if(a == b)
+            {
+                continue;
+            }
+
+            Vec2 springForce = Force::GenerateSpringForce(*a, *b, restLength, k);
+            a->AddForce(springForce);
+            b->AddForce(-springForce);
+        }
     }
 
     for (Particle* particle: particles)
@@ -149,8 +174,7 @@ void Application::Update()
         {
             particle->Position.x = particle->Radius;
             particle->Velocity.x *= -0.9f;
-        }
-        else if (particle->Position.x + particle->Radius >= Graphics::Width())
+        } else if (particle->Position.x + particle->Radius >= Graphics::Width())
         {
             particle->Position.x = Graphics::Width() - particle->Radius;
             particle->Velocity.x *= -0.9f;
@@ -160,8 +184,7 @@ void Application::Update()
         {
             particle->Position.y = particle->Radius;
             particle->Velocity.y *= -0.9f;
-        }
-        else if (particle->Position.y + particle->Radius >= Graphics::Height())
+        } else if (particle->Position.y + particle->Radius >= Graphics::Height())
         {
             particle->Position.y = Graphics::Height() - particle->Radius;
             particle->Velocity.y *= -0.9f;
@@ -176,18 +199,38 @@ void Application::Render()
     if (leftMouseButtonDown)
     {
         Graphics::DrawLine(
-                particles[NUM_PARTICLES - 1]->Position.x,
-                particles[NUM_PARTICLES - 1]->Position.y,
+                particles[0]->Position.x,
+                particles[0]->Position.y,
                 mouseCursor.x,
                 mouseCursor.y,
                 0xFF0000FF);
     }
 
-    Graphics::DrawLine(anchor.x, anchor.y, particles[0]->Position.x, particles[0]->Position.y, 0xFF313131);
+//    // Chain
+//    Graphics::DrawLine(anchor.x, anchor.y, particles[0]->Position.x, particles[0]->Position.y, 0xFF313131);
+//
+//    for (int i = 1; i < NUM_PARTICLES; i++)
+//    {
+//        Graphics::DrawLine(particles[i]->Position.x, particles[i]->Position.y, particles[i - 1]->Position.x,
+//                           particles[i - 1]->Position.y, 0xFF313131);
+//    }
 
-    for (int i = 1; i < NUM_PARTICLES; i++)
+    // Soft-body
+    for (Particle* a : particles)
     {
-        Graphics::DrawLine(particles[i]->Position.x, particles[i]->Position.y, particles[i - 1]->Position.x, particles[i - 1]->Position.y, 0xFF313131);
+        for (Particle* b : particles)
+        {
+            if(a == b)
+            {
+                continue;
+            }
+
+            Vec2 springForce = Force::GenerateSpringForce(*a, *b, restLength, k);
+            a->AddForce(springForce);
+            b->AddForce(-springForce);
+
+            Graphics::DrawLine(a->Position.x, a->Position.y, b->Position.x, b->Position.y, 0xFF313131);
+        }
     }
 
     for (Particle* particle: particles)

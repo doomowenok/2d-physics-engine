@@ -14,8 +14,8 @@ private:
     bool leftMouseButtonDown = false;
 
     Vec2 anchor;
-    float k = 300.0f;
-    float restLength = 15.0f;
+    float k = 1500.0f;
+    float restLength = 200.0f;
     const int NUM_PARTICLES = 15;
 
 public:
