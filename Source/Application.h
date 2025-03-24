@@ -13,9 +13,10 @@ private:
     Vec2 mouseCursor = Vec2(0.0f, 0.0f);
     bool leftMouseButtonDown = false;
 
-    Vec2 anchor = Vec2(0.0f, 0.0f);
-    float k = 40.0f;
-    float restLength = 200.0f;
+    Vec2 anchor;
+    float k = 300.0f;
+    float restLength = 15.0f;
+    const int NUM_PARTICLES = 15;
 
 public:
     Application() = default;
