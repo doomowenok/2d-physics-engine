@@ -12,10 +12,10 @@ void Application::Setup()
 {
     running = Graphics::OpenWindow();
 
-    Particle* smallPlanet = new Particle(100, 100, 1.0f, 6);
+    Particle* smallPlanet = new Particle(200, 200, 1.0f, 6);
     particles.push_back(smallPlanet);
 
-    Particle* bigPlanet = new Particle(500, 500, 100000000.0f, 20);
+    Particle* bigPlanet = new Particle(500, 500, 200.0f, 20);
     particles.push_back(bigPlanet);
 }
 
@@ -123,11 +123,11 @@ void Application::Update()
 //        particle->AddForce(weight * particle->Mass);
         particle->AddForce(pushForce);
 
-        Vec2 friction = Force::GenerateFrictionForce(*particle, 10.0f * PIXELS_PER_METER);
+        Vec2 friction = Force::GenerateFrictionForce(*particle, 20.0f);
         particle->AddForce(friction);
     }
 
-    Vec2 attraction = Force::GenerateGravitationalForce(*particles[0], *particles[1], 1.0f);
+    Vec2 attraction = Force::GenerateGravitationalForce(*particles[0], *particles[1], 1000.0f, 5.0f, 100.0f);
     particles[0]->AddForce(attraction);
     particles[1]->AddForce(-attraction);
 
