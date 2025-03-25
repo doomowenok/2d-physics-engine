@@ -17,14 +17,14 @@ void Application::Setup()
 //    // Chain
 //    for (int i = 0; i < NUM_PARTICLES; i++)
 //    {
-//        particles.push_back(new Particle(anchor.x, anchor.y + restLength * i, 2, 6));
+//        bodies.push_back(new Body(anchor.x, anchor.y + restLength * i, 2, 6));
 //    }
 
     // Soft-body
-    particles.push_back(new Particle(100, 100, 2.0f, 6));
-    particles.push_back(new Particle(100 + restLength, 100, 2.0f, 6));
-    particles.push_back(new Particle(100 + restLength, 100 - restLength, 2.0f, 6));
-    particles.push_back(new Particle(100, 100 - restLength, 2.0f, 6));
+    bodies.push_back(new Body(100, 100, 2.0f, 6));
+    bodies.push_back(new Body(100 + restLength, 100, 2.0f, 6));
+    bodies.push_back(new Body(100 + restLength, 100 - restLength, 2.0f, 6));
+    bodies.push_back(new Body(100, 100 - restLength, 2.0f, 6));
 }
 
 void Application::Input()
@@ -97,9 +97,9 @@ void Application::Input()
                     leftMouseButtonDown = false;
                     int particleIndex = 0;
                     // int particleIndex = NUM_PARTICLES - 1;
-                    Vec2 impulseDirection = (particles[particleIndex]->Position - mouseCursor).UnitVector();
-                    float impulseMagnitude = (particles[particleIndex]->Position - mouseCursor).Magnitude() * 5.0;
-                    particles[particleIndex]->Velocity = impulseDirection * impulseMagnitude;
+                    Vec2 impulseDirection = (bodies[particleIndex]->Position - mouseCursor).UnitVector();
+                    float impulseMagnitude = (bodies[particleIndex]->Position - mouseCursor).Magnitude() * 5.0;
+                    bodies[particleIndex]->Velocity = impulseDirection * impulseMagnitude;
                 }
                 break;
         }
@@ -126,31 +126,31 @@ void Application::Update()
 
     timePreviousFrame = SDL_GetTicks();
 
-    for (Particle* particle: particles)
+    for (Body* body: bodies)
     {
-        // particle->AddForce(pushForce);
+        // body->AddForce(pushForce);
 
-        Vec2 drag = Force::GenerateDragForce(*particle, 0.003f);
-        particle->AddForce(drag);
+        Vec2 drag = Force::GenerateDragForce(*body, 0.003f);
+        body->AddForce(drag);
 
-        Vec2 weight = Vec2(0.0f, particle->Mass * 9.8f * PIXELS_PER_METER);
-        particle->AddForce(weight);
+        Vec2 weight = Vec2(0.0f, body->Mass * 9.8f * PIXELS_PER_METER);
+        body->AddForce(weight);
     }
 
 //    // Chain
-//    particles[0]->AddForce(Force::GenerateSpringForce(*particles[0], anchor, restLength, k));
+//    bodies[0]->AddForce(Force::GenerateSpringForce(*bodies[0], anchor, restLength, k));
 //
 //    for (int i = 1; i < NUM_PARTICLES; i++)
 //    {
-//        Vec2 springForce = Force::GenerateSpringForce(*particles[i], *particles[i - 1], restLength, k);
-//        particles[i]->AddForce(springForce);
-//        particles[i - 1]->AddForce(-springForce);
+//        Vec2 springForce = Force::GenerateSpringForce(*bodies[i], *bodies[i - 1], restLength, k);
+//        bodies[i]->AddForce(springForce);
+//        bodies[i - 1]->AddForce(-springForce);
 //    }
 
     // Soft-body
-    for (Particle* a : particles)
+    for (Body* a : bodies)
     {
-        for (Particle* b : particles)
+        for (Body* b : bodies)
         {
             if(a == b)
             {
@@ -163,31 +163,31 @@ void Application::Update()
         }
     }
 
-    for (Particle* particle: particles)
+    for (Body* body: bodies)
     {
-        particle->Integrate(deltaTime);
+        body->Integrate(deltaTime);
     }
 
-    for (Particle* particle: particles)
+    for (Body* body: bodies)
     {
-        if (particle->Position.x - particle->Radius <= 0)
+        if (body->Position.x - body->Radius <= 0)
         {
-            particle->Position.x = particle->Radius;
-            particle->Velocity.x *= -0.9f;
-        } else if (particle->Position.x + particle->Radius >= Graphics::Width())
+            body->Position.x = body->Radius;
+            body->Velocity.x *= -0.9f;
+        } else if (body->Position.x + body->Radius >= Graphics::Width())
         {
-            particle->Position.x = Graphics::Width() - particle->Radius;
-            particle->Velocity.x *= -0.9f;
+            body->Position.x = Graphics::Width() - body->Radius;
+            body->Velocity.x *= -0.9f;
         }
 
-        if (particle->Position.y - particle->Radius <= 0)
+        if (body->Position.y - body->Radius <= 0)
         {
-            particle->Position.y = particle->Radius;
-            particle->Velocity.y *= -0.9f;
-        } else if (particle->Position.y + particle->Radius >= Graphics::Height())
+            body->Position.y = body->Radius;
+            body->Velocity.y *= -0.9f;
+        } else if (body->Position.y + body->Radius >= Graphics::Height())
         {
-            particle->Position.y = Graphics::Height() - particle->Radius;
-            particle->Velocity.y *= -0.9f;
+            body->Position.y = Graphics::Height() - body->Radius;
+            body->Velocity.y *= -0.9f;
         }
     }
 }
@@ -199,26 +199,26 @@ void Application::Render()
     if (leftMouseButtonDown)
     {
         Graphics::DrawLine(
-                particles[0]->Position.x,
-                particles[0]->Position.y,
+                bodies[0]->Position.x,
+                bodies[0]->Position.y,
                 mouseCursor.x,
                 mouseCursor.y,
                 0xFF0000FF);
     }
 
 //    // Chain
-//    Graphics::DrawLine(anchor.x, anchor.y, particles[0]->Position.x, particles[0]->Position.y, 0xFF313131);
+//    Graphics::DrawLine(anchor.x, anchor.y, bodies[0]->Position.x, bodies[0]->Position.y, 0xFF313131);
 //
 //    for (int i = 1; i < NUM_PARTICLES; i++)
 //    {
-//        Graphics::DrawLine(particles[i]->Position.x, particles[i]->Position.y, particles[i - 1]->Position.x,
-//                           particles[i - 1]->Position.y, 0xFF313131);
+//        Graphics::DrawLine(bodies[i]->Position.x, bodies[i]->Position.y, bodies[i - 1]->Position.x,
+//                           bodies[i - 1]->Position.y, 0xFF313131);
 //    }
 
     // Soft-body
-    for (Particle* a : particles)
+    for (Body* a : bodies)
     {
-        for (Particle* b : particles)
+        for (Body* b : bodies)
         {
             if(a == b)
             {
@@ -233,9 +233,9 @@ void Application::Render()
         }
     }
 
-    for (Particle* particle: particles)
+    for (Body* body: bodies)
     {
-        Graphics::DrawFillCircle(particle->Position.x, particle->Position.y, particle->Radius, 0xFFFFFFFF);
+        Graphics::DrawFillCircle(body->Position.x, body->Position.y, body->Radius, 0xFFFFFFFF);
     }
 
     Graphics::RenderFrame();
@@ -243,7 +243,7 @@ void Application::Render()
 
 void Application::Destroy()
 {
-    for (Particle* particle: particles)
+    for (Body* particle: bodies)
     {
         delete particle;
     }
