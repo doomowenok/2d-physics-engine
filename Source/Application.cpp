@@ -119,44 +119,17 @@ void Application::Update()
 
     for(Body* body: bodies)
     {
-        // body->AddForce(pushForce);
-
-        Vec2 drag = Force::GenerateDragForce(*body, 0.003f);
-        body->AddForce(drag);
-
         Vec2 weight = Vec2(0.0f, body->mass * 9.8f * PIXELS_PER_METER);
         body->AddForce(weight);
-    }
 
-//    // Chain
-//    bodies[0]->AddForce(Force::GenerateSpringForce(*bodies[0], anchor, restLength, k));
-//
-//    for (int i = 1; i < NUM_PARTICLES; i++)
-//    {
-//        Vec2 springForce = Force::GenerateSpringForce(*bodies[i], *bodies[i - 1], restLength, k);
-//        bodies[i]->AddForce(springForce);
-//        bodies[i - 1]->AddForce(-springForce);
-//    }
-
-    // Soft-body
-    for(Body* a: bodies)
-    {
-        for(Body* b: bodies)
-        {
-            if(a == b)
-            {
-                continue;
-            }
-
-            Vec2 springForce = Force::GenerateSpringForce(*a, *b, restLength, k);
-            a->AddForce(springForce);
-            b->AddForce(-springForce);
-        }
+        float torque = 20.0f;
+        body->AddTorque(torque);
     }
 
     for(Body* body: bodies)
     {
-        body->Integrate(deltaTime);
+        body->IntegrateLinear(deltaTime);
+        body->IntegrateAngular(deltaTime);
     }
 
     for(Body* body: bodies)
@@ -209,8 +182,6 @@ void Application::Render()
                 0xFF0000FF);
     }
 
-    static float angle = 0.0f;
-
     for(Body* body: bodies)
     {
         if(body->shape->GetType() == CIRCLE)
@@ -222,15 +193,13 @@ void Application::Render()
                 continue;
             }
 
-            Graphics::DrawCircle(body->position.x, body->position.y, circleShape->radius, angle, 0xFFFFFFFF);
+            Graphics::DrawCircle(body->position.x, body->position.y, circleShape->radius, body->rotation, 0xFFFFFFFF);
         }
         else
         {
 
         }
     }
-
-    angle += 0.1f;
 
     Graphics::RenderFrame();
 }

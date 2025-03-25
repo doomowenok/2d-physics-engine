@@ -4,8 +4,17 @@ Body::Body(const Shape& shape, float x, float y, float mass)
 {
     this->shape = shape.Clone();
     this->position = Vec2(x, y);
+    this->velocity = Vec2(0.0f, 0.0f);
+    this->acceleration = Vec2(0.0f, 0.0f);
+    this->rotation = 0.0f;
+    this->angularVelocity = 0.0f;
+    this->angularAcceleration = 0.0f;
+    this->sumForces = Vec2(0.0f, 0.0f);
+    this->sumTorque = 0.0f;
     this->mass = mass;
     this->inverseMass = mass == 0.0f ? 0.0f : 1.0f / mass;
+    this->I = shape.GetMomentOfInertia() * mass;
+    this->inverseI = I == 0.0f ? 0.0f : 1.0f / I;
 }
 
 Body::~Body()
@@ -13,7 +22,27 @@ Body::~Body()
     delete shape;
 }
 
-void Body::Integrate(float deltaTime)
+void Body::AddForce(const Vec2& force)
+{
+    sumForces += force;
+}
+
+void Body::AddTorque(float torque)
+{
+    sumTorque += torque;
+}
+
+void Body::ClearForces()
+{
+    sumForces = Vec2(0.0f, 0.0f);
+}
+
+void Body::ClearTorque()
+{
+    sumTorque = 0.0f;
+}
+
+void Body::IntegrateLinear(float deltaTime)
 {
     // acceleration = sumForces / mass;
     acceleration = sumForces * inverseMass;
@@ -24,12 +53,13 @@ void Body::Integrate(float deltaTime)
     ClearForces();
 }
 
-void Body::AddForce(const Vec2& force)
+void Body::IntegrateAngular(float deltaTime)
 {
-    sumForces += force;
-}
+    // angularAcceleration = sumTorque / I;
+    angularAcceleration = sumTorque * inverseI;
 
-void Body::ClearForces()
-{
-    sumForces = Vec2(0.0f, 0.0f);
+    angularVelocity += angularAcceleration * deltaTime;
+    rotation += angularVelocity * deltaTime;
+
+    ClearTorque();
 }
