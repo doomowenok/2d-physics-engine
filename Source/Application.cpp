@@ -14,65 +14,56 @@ void Application::Setup()
 
     anchor = Vec2(Graphics::Width() / 2.0f, 30.0f);
 
-//    // Chain
-//    for (int i = 0; i < NUM_PARTICLES; i++)
-//    {
-//        bodies.push_back(new Body(anchor.x, anchor.y + restLength * i, 2, 6));
-//    }
-
-    // Soft-body
-    bodies.push_back(new Body(100, 100, 2.0f, 6));
-    bodies.push_back(new Body(100 + restLength, 100, 2.0f, 6));
-    bodies.push_back(new Body(100 + restLength, 100 - restLength, 2.0f, 6));
-    bodies.push_back(new Body(100, 100 - restLength, 2.0f, 6));
+    Body* body = new Body(CircleShape(50), 100, 100, 2.0f);
+    bodies.push_back(body);
 }
 
 void Application::Input()
 {
     SDL_Event event;
-    while (SDL_PollEvent(&event))
+    while(SDL_PollEvent(&event))
     {
-        switch (event.type)
+        switch(event.type)
         {
             case SDL_QUIT:
                 running = false;
                 break;
             case SDL_KEYDOWN:
-                if (event.key.keysym.sym == SDLK_ESCAPE)
+                if(event.key.keysym.sym == SDLK_ESCAPE)
                 {
                     running = false;
                 }
-                if (event.key.keysym.sym == SDLK_UP)
+                if(event.key.keysym.sym == SDLK_UP)
                 {
                     pushForce.y = 50.0 * PIXELS_PER_METER;
                 }
-                if (event.key.keysym.sym == SDLK_RIGHT)
+                if(event.key.keysym.sym == SDLK_RIGHT)
                 {
                     pushForce.x = 50.0 * PIXELS_PER_METER;
                 }
-                if (event.key.keysym.sym == SDLK_DOWN)
+                if(event.key.keysym.sym == SDLK_DOWN)
                 {
                     pushForce.y = -50.0 * PIXELS_PER_METER;
                 }
-                if (event.key.keysym.sym == SDLK_LEFT)
+                if(event.key.keysym.sym == SDLK_LEFT)
                 {
                     pushForce.x = -50.0 * PIXELS_PER_METER;
                 }
                 break;
             case SDL_KEYUP:
-                if (event.key.keysym.sym == SDLK_UP)
+                if(event.key.keysym.sym == SDLK_UP)
                 {
                     pushForce.y = 0.0f;
                 }
-                if (event.key.keysym.sym == SDLK_RIGHT)
+                if(event.key.keysym.sym == SDLK_RIGHT)
                 {
                     pushForce.x = 0.0f;
                 }
-                if (event.key.keysym.sym == SDLK_DOWN)
+                if(event.key.keysym.sym == SDLK_DOWN)
                 {
                     pushForce.y = 0.0f;
                 }
-                if (event.key.keysym.sym == SDLK_LEFT)
+                if(event.key.keysym.sym == SDLK_LEFT)
                 {
                     pushForce.x = 0.0f;
                 }
@@ -82,7 +73,7 @@ void Application::Input()
                 mouseCursor.y = event.motion.y;
                 break;
             case SDL_MOUSEBUTTONDOWN:
-                if (!leftMouseButtonDown && event.button.button == SDL_BUTTON_LEFT)
+                if(!leftMouseButtonDown && event.button.button == SDL_BUTTON_LEFT)
                 {
                     leftMouseButtonDown = true;
                     int x, y;
@@ -92,14 +83,14 @@ void Application::Input()
                 }
                 break;
             case SDL_MOUSEBUTTONUP:
-                if (leftMouseButtonDown && event.button.button == SDL_BUTTON_LEFT)
+                if(leftMouseButtonDown && event.button.button == SDL_BUTTON_LEFT)
                 {
                     leftMouseButtonDown = false;
                     int particleIndex = 0;
                     // int particleIndex = NUM_PARTICLES - 1;
-                    Vec2 impulseDirection = (bodies[particleIndex]->Position - mouseCursor).UnitVector();
-                    float impulseMagnitude = (bodies[particleIndex]->Position - mouseCursor).Magnitude() * 5.0;
-                    bodies[particleIndex]->Velocity = impulseDirection * impulseMagnitude;
+                    Vec2 impulseDirection = (bodies[particleIndex]->position - mouseCursor).UnitVector();
+                    float impulseMagnitude = (bodies[particleIndex]->position - mouseCursor).Magnitude() * 5.0;
+                    bodies[particleIndex]->velocity = impulseDirection * impulseMagnitude;
                 }
                 break;
         }
@@ -112,28 +103,28 @@ void Application::Update()
 
     int timeToWait = MILLISECONDS_PER_FRAME - (SDL_GetTicks() - timePreviousFrame);
 
-    if (timeToWait > 0)
+    if(timeToWait > 0)
     {
         SDL_Delay(timeToWait);
     }
 
     float deltaTime = (float) (SDL_GetTicks() - timePreviousFrame) / MILLISECONDS_IN_SECOND;
 
-    if (deltaTime > 0.016)
+    if(deltaTime > 0.016)
     {
         deltaTime = 0.016;
     }
 
     timePreviousFrame = SDL_GetTicks();
 
-    for (Body* body: bodies)
+    for(Body* body: bodies)
     {
         // body->AddForce(pushForce);
 
         Vec2 drag = Force::GenerateDragForce(*body, 0.003f);
         body->AddForce(drag);
 
-        Vec2 weight = Vec2(0.0f, body->Mass * 9.8f * PIXELS_PER_METER);
+        Vec2 weight = Vec2(0.0f, body->mass * 9.8f * PIXELS_PER_METER);
         body->AddForce(weight);
     }
 
@@ -148,9 +139,9 @@ void Application::Update()
 //    }
 
     // Soft-body
-    for (Body* a : bodies)
+    for(Body* a: bodies)
     {
-        for (Body* b : bodies)
+        for(Body* b: bodies)
         {
             if(a == b)
             {
@@ -163,31 +154,33 @@ void Application::Update()
         }
     }
 
-    for (Body* body: bodies)
+    for(Body* body: bodies)
     {
         body->Integrate(deltaTime);
     }
 
-    for (Body* body: bodies)
+    for(Body* body: bodies)
     {
-        if (body->Position.x - body->Radius <= 0)
+        if(body->position.x - body->radius <= 0)
         {
-            body->Position.x = body->Radius;
-            body->Velocity.x *= -0.9f;
-        } else if (body->Position.x + body->Radius >= Graphics::Width())
+            body->position.x = body->radius;
+            body->velocity.x *= -0.9f;
+        }
+        else if(body->position.x + body->radius >= Graphics::Width())
         {
-            body->Position.x = Graphics::Width() - body->Radius;
-            body->Velocity.x *= -0.9f;
+            body->position.x = Graphics::Width() - body->radius;
+            body->velocity.x *= -0.9f;
         }
 
-        if (body->Position.y - body->Radius <= 0)
+        if(body->position.y - body->radius <= 0)
         {
-            body->Position.y = body->Radius;
-            body->Velocity.y *= -0.9f;
-        } else if (body->Position.y + body->Radius >= Graphics::Height())
+            body->position.y = body->radius;
+            body->velocity.y *= -0.9f;
+        }
+        else if(body->position.y + body->radius >= Graphics::Height())
         {
-            body->Position.y = Graphics::Height() - body->Radius;
-            body->Velocity.y *= -0.9f;
+            body->position.y = Graphics::Height() - body->radius;
+            body->velocity.y *= -0.9f;
         }
     }
 }
@@ -196,29 +189,29 @@ void Application::Render()
 {
     Graphics::ClearScreen(0xFF056263);
 
-    if (leftMouseButtonDown)
+    if(leftMouseButtonDown)
     {
         Graphics::DrawLine(
-                bodies[0]->Position.x,
-                bodies[0]->Position.y,
+                bodies[0]->position.x,
+                bodies[0]->position.y,
                 mouseCursor.x,
                 mouseCursor.y,
                 0xFF0000FF);
     }
 
 //    // Chain
-//    Graphics::DrawLine(anchor.x, anchor.y, bodies[0]->Position.x, bodies[0]->Position.y, 0xFF313131);
+//    Graphics::DrawLine(anchor.x, anchor.y, bodies[0]->position.x, bodies[0]->position.y, 0xFF313131);
 //
 //    for (int i = 1; i < NUM_PARTICLES; i++)
 //    {
-//        Graphics::DrawLine(bodies[i]->Position.x, bodies[i]->Position.y, bodies[i - 1]->Position.x,
-//                           bodies[i - 1]->Position.y, 0xFF313131);
+//        Graphics::DrawLine(bodies[i]->position.x, bodies[i]->position.y, bodies[i - 1]->position.x,
+//                           bodies[i - 1]->position.y, 0xFF313131);
 //    }
 
     // Soft-body
-    for (Body* a : bodies)
+    for(Body* a: bodies)
     {
-        for (Body* b : bodies)
+        for(Body* b: bodies)
         {
             if(a == b)
             {
@@ -229,13 +222,13 @@ void Application::Render()
             a->AddForce(springForce);
             b->AddForce(-springForce);
 
-            Graphics::DrawLine(a->Position.x, a->Position.y, b->Position.x, b->Position.y, 0xFF313131);
+            Graphics::DrawLine(a->position.x, a->position.y, b->position.x, b->position.y, 0xFF313131);
         }
     }
 
-    for (Body* body: bodies)
+    for(Body* body: bodies)
     {
-        Graphics::DrawFillCircle(body->Position.x, body->Position.y, body->Radius, 0xFFFFFFFF);
+        Graphics::DrawFillCircle(body->position.x, body->position.y, body->radius, 0xFFFFFFFF);
     }
 
     Graphics::RenderFrame();
@@ -243,7 +236,7 @@ void Application::Render()
 
 void Application::Destroy()
 {
-    for (Body* particle: bodies)
+    for(Body* particle: bodies)
     {
         delete particle;
     }

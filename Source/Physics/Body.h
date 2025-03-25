@@ -1,23 +1,28 @@
 #pragma once
 
 #include "Vec2.h"
+#include "Shape.h"
 
 struct Body
 {
-    Vec2 Position;
-    Vec2 Velocity;
-    Vec2 Acceleration;
-    Vec2 SumForces;
+    Vec2 position;
+    Vec2 velocity;
+    Vec2 acceleration;
 
-    int Radius;
+    Vec2 sumForces;
 
-    float Mass;
-    float InverseMass;
+    float radius;
 
-    Body(float x, float y, float mass, int radius);
+    float mass;
+    float inverseMass;
+
+    Shape* shape = nullptr;
+
+    Body(const Shape& shape, float x, float y, float mass);
     ~Body();
 
     void AddForce(const Vec2& force);
     void ClearForces();
+
     void Integrate(float deltaTime);
 };
