@@ -161,26 +161,36 @@ void Application::Update()
 
     for(Body* body: bodies)
     {
-        if(body->position.x - body->radius <= 0)
+        if(body->shape->GetType() == CIRCLE)
         {
-            body->position.x = body->radius;
-            body->velocity.x *= -0.9f;
-        }
-        else if(body->position.x + body->radius >= Graphics::Width())
-        {
-            body->position.x = Graphics::Width() - body->radius;
-            body->velocity.x *= -0.9f;
-        }
+            CircleShape* circleShape = (CircleShape*) body->shape;
 
-        if(body->position.y - body->radius <= 0)
-        {
-            body->position.y = body->radius;
-            body->velocity.y *= -0.9f;
-        }
-        else if(body->position.y + body->radius >= Graphics::Height())
-        {
-            body->position.y = Graphics::Height() - body->radius;
-            body->velocity.y *= -0.9f;
+            if(!circleShape)
+            {
+                continue;
+            }
+
+            if(body->position.x - circleShape->radius <= 0)
+            {
+                body->position.x = circleShape->radius;
+                body->velocity.x *= -0.9f;
+            }
+            else if(body->position.x + circleShape->radius >= Graphics::Width())
+            {
+                body->position.x = Graphics::Width() - circleShape->radius;
+                body->velocity.x *= -0.9f;
+            }
+
+            if(body->position.y - circleShape->radius <= 0)
+            {
+                body->position.y = circleShape->radius;
+                body->velocity.y *= -0.9f;
+            }
+            else if(body->position.y + circleShape->radius >= Graphics::Height())
+            {
+                body->position.y = Graphics::Height() - circleShape->radius;
+                body->velocity.y *= -0.9f;
+            }
         }
     }
 }
@@ -199,37 +209,28 @@ void Application::Render()
                 0xFF0000FF);
     }
 
-//    // Chain
-//    Graphics::DrawLine(anchor.x, anchor.y, bodies[0]->position.x, bodies[0]->position.y, 0xFF313131);
-//
-//    for (int i = 1; i < NUM_PARTICLES; i++)
-//    {
-//        Graphics::DrawLine(bodies[i]->position.x, bodies[i]->position.y, bodies[i - 1]->position.x,
-//                           bodies[i - 1]->position.y, 0xFF313131);
-//    }
+    static float angle = 0.0f;
 
-    // Soft-body
-    for(Body* a: bodies)
+    for(Body* body: bodies)
     {
-        for(Body* b: bodies)
+        if(body->shape->GetType() == CIRCLE)
         {
-            if(a == b)
+            CircleShape* circleShape = (CircleShape*) body->shape;
+
+            if(!circleShape)
             {
                 continue;
             }
 
-            Vec2 springForce = Force::GenerateSpringForce(*a, *b, restLength, k);
-            a->AddForce(springForce);
-            b->AddForce(-springForce);
+            Graphics::DrawCircle(body->position.x, body->position.y, circleShape->radius, angle, 0xFFFFFFFF);
+        }
+        else
+        {
 
-            Graphics::DrawLine(a->position.x, a->position.y, b->position.x, b->position.y, 0xFF313131);
         }
     }
 
-    for(Body* body: bodies)
-    {
-        Graphics::DrawFillCircle(body->position.x, body->position.y, body->radius, 0xFFFFFFFF);
-    }
+    angle += 0.1f;
 
     Graphics::RenderFrame();
 }

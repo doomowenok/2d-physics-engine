@@ -11,8 +11,6 @@ struct Body
 
     Vec2 sumForces;
 
-    float radius;
-
     float mass;
     float inverseMass;
 
