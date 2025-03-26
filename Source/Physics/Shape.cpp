@@ -54,6 +54,11 @@ BoxShape::BoxShape(float width, float height)
 {
     this->width = width;
     this->height = height;
+
+    vertices.push_back(Vec2(-(width / 2.0f), -(height / 2.0f)));
+    vertices.push_back(Vec2(+(width / 2.0f), -(height / 2.0f)));
+    vertices.push_back(Vec2(+(width / 2.0f), +(height / 2.0f)));
+    vertices.push_back(Vec2(-(width / 2.0f), +(height / 2.0f)));
 }
 
 BoxShape::~BoxShape()

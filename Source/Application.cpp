@@ -14,8 +14,8 @@ void Application::Setup()
 
     anchor = Vec2(Graphics::Width() / 2.0f, 30.0f);
 
-    Body* body = new Body(CircleShape(50), 100, 100, 2.0f);
-    bodies.push_back(body);
+    Body* box = new Body(BoxShape(200, 100), Graphics::Width() / 2, Graphics::Height() / 2, 1.0f);
+    bodies.push_back(box);
 }
 
 void Application::Input()
@@ -119,11 +119,11 @@ void Application::Update()
 
     for(Body* body: bodies)
     {
-        Vec2 weight = Vec2(0.0f, body->mass * 9.8f * PIXELS_PER_METER);
-        body->AddForce(weight);
+        // Vec2 weight = Vec2(0.0f, body->mass * 9.8f * PIXELS_PER_METER);
+        // body->AddForce(weight);
 
-        float torque = 20.0f;
-        body->AddTorque(torque);
+        // float torque = 20.0f;
+        // body->AddTorque(torque);
     }
 
     for(Body* body: bodies)
@@ -187,17 +187,12 @@ void Application::Render()
         if(body->shape->GetType() == CIRCLE)
         {
             CircleShape* circleShape = (CircleShape*) body->shape;
-
-            if(!circleShape)
-            {
-                continue;
-            }
-
             Graphics::DrawCircle(body->position.x, body->position.y, circleShape->radius, body->rotation, 0xFFFFFFFF);
         }
-        else
+        else if (body->shape->GetType() == BOX)
         {
-
+            BoxShape* boxShape = (BoxShape*) body->shape;
+            Graphics::DrawPolygon(body->position.x, body->position.y, boxShape->vertices, 0xFFFFFFFF);
         }
     }
 
