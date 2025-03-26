@@ -42,7 +42,7 @@ ShapeType PolygonShape::GetType() const
 
 Shape* PolygonShape::Clone() const
 {
-    return new PolygonShape(this->vertices);
+    return new PolygonShape(this->localVertices);
 }
 
 float PolygonShape::GetMomentOfInertia() const
@@ -50,15 +50,29 @@ float PolygonShape::GetMomentOfInertia() const
     return 0.0f;
 }
 
+void PolygonShape::UpdateVertices(float angle, const Vec2& position)
+{
+    for(int i = 0; i < localVertices.size(); i++)
+    {
+        worldVertices[i] = localVertices[i].Rotate(angle);
+        worldVertices[i] += position;
+    }
+}
+
 BoxShape::BoxShape(float width, float height)
 {
     this->width = width;
     this->height = height;
 
-    vertices.push_back(Vec2(-(width / 2.0f), -(height / 2.0f)));
-    vertices.push_back(Vec2(+(width / 2.0f), -(height / 2.0f)));
-    vertices.push_back(Vec2(+(width / 2.0f), +(height / 2.0f)));
-    vertices.push_back(Vec2(-(width / 2.0f), +(height / 2.0f)));
+    localVertices.push_back(Vec2(-(width / 2.0f), -(height / 2.0f)));
+    localVertices.push_back(Vec2(+(width / 2.0f), -(height / 2.0f)));
+    localVertices.push_back(Vec2(+(width / 2.0f), +(height / 2.0f)));
+    localVertices.push_back(Vec2(-(width / 2.0f), +(height / 2.0f)));
+
+    worldVertices.push_back(Vec2(-(width / 2.0f), -(height / 2.0f)));
+    worldVertices.push_back(Vec2(+(width / 2.0f), -(height / 2.0f)));
+    worldVertices.push_back(Vec2(+(width / 2.0f), +(height / 2.0f)));
+    worldVertices.push_back(Vec2(-(width / 2.0f), +(height / 2.0f)));
 }
 
 BoxShape::~BoxShape()

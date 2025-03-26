@@ -33,4 +33,6 @@ struct Body
 
     void IntegrateLinear(float deltaTime);
     void IntegrateAngular(float deltaTime);
+
+    void Update(float deltaTime);
 };

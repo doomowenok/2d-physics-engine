@@ -63,3 +63,18 @@ void Body::IntegrateAngular(float deltaTime)
 
     ClearTorque();
 }
+
+void Body::Update(float deltaTime)
+{
+    IntegrateLinear(deltaTime);
+    IntegrateAngular(deltaTime);
+
+    ShapeType shapeType = shape->GetType();
+    bool isPolygon = shapeType == POLYGON || shapeType == BOX;
+
+    if(isPolygon)
+    {
+        PolygonShape* polygonShape = (PolygonShape*) shape;
+        polygonShape->UpdateVertices(rotation, position);
+    }
+}

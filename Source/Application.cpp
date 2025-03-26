@@ -122,14 +122,13 @@ void Application::Update()
         // Vec2 weight = Vec2(0.0f, body->mass * 9.8f * PIXELS_PER_METER);
         // body->AddForce(weight);
 
-        // float torque = 20.0f;
-        // body->AddTorque(torque);
+         float torque = 2000.0f;
+         body->AddTorque(torque);
     }
 
     for(Body* body: bodies)
     {
-        body->IntegrateLinear(deltaTime);
-        body->IntegrateAngular(deltaTime);
+        body->Update(deltaTime);
     }
 
     for(Body* body: bodies)
@@ -192,7 +191,7 @@ void Application::Render()
         else if (body->shape->GetType() == BOX)
         {
             BoxShape* boxShape = (BoxShape*) body->shape;
-            Graphics::DrawPolygon(body->position.x, body->position.y, boxShape->vertices, 0xFFFFFFFF);
+            Graphics::DrawPolygon(body->position.x, body->position.y, boxShape->worldVertices, 0xFFFFFFFF);
         }
     }
 
