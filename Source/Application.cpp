@@ -3,6 +3,7 @@
 #include "Graphics.h"
 #include "Physics/Force.h"
 #include "Physics/CollisionDetection.h"
+#include "Physics/Contact.h"
 
 bool Application::IsRunning()
 {
@@ -15,10 +16,10 @@ void Application::Setup()
 
     anchor = Vec2(Graphics::Width() / 2.0f, 30.0f);
 
-    Body* ball0 = new Body(CircleShape(50), 100, 100, 1.0f);
+    Body* ball0 = new Body(CircleShape(100), 200, 200, 1.0f);
     bodies.push_back(ball0);
 
-    Body* ball1 = new Body(CircleShape(100), 500, 100, 1.0f);
+    Body* ball1 = new Body(CircleShape(50), 500, 100, 1.0f);
     bodies.push_back(ball1);
 }
 
@@ -73,29 +74,11 @@ void Application::Input()
                 }
                 break;
             case SDL_MOUSEMOTION:
-                mouseCursor.x = event.motion.x;
-                mouseCursor.y = event.motion.y;
-                break;
-            case SDL_MOUSEBUTTONDOWN:
-                if(!leftMouseButtonDown && event.button.button == SDL_BUTTON_LEFT)
-                {
-                    leftMouseButtonDown = true;
-                    int x, y;
-                    SDL_GetMouseState(&x, &y);
-                    mouseCursor.x = x;
-                    mouseCursor.y = y;
-                }
-                break;
-            case SDL_MOUSEBUTTONUP:
-                if(leftMouseButtonDown && event.button.button == SDL_BUTTON_LEFT)
-                {
-                    leftMouseButtonDown = false;
-                    int particleIndex = 0;
-                    // int particleIndex = NUM_PARTICLES - 1;
-                    Vec2 impulseDirection = (bodies[particleIndex]->position - mouseCursor).UnitVector();
-                    float impulseMagnitude = (bodies[particleIndex]->position - mouseCursor).Magnitude() * 5.0;
-                    bodies[particleIndex]->velocity = impulseDirection * impulseMagnitude;
-                }
+                int x;
+                int y;
+                SDL_GetMouseState(&x, &y);
+                bodies[0]->position.x = x;
+                bodies[0]->position.y = y;
                 break;
         }
     }
@@ -103,6 +86,8 @@ void Application::Input()
 
 void Application::Update()
 {
+    Graphics::ClearScreen(0xFF056263);
+
     static int timePreviousFrame;
 
     int timeToWait = MILLISECONDS_PER_FRAME - (SDL_GetTicks() - timePreviousFrame);
@@ -123,11 +108,11 @@ void Application::Update()
 
     for(Body* body: bodies)
     {
-         Vec2 weight = Vec2(0.0f, body->mass * 9.8f * PIXELS_PER_METER);
-         body->AddForce(weight);
-
-         Vec2 wind = Vec2(20.0f, 0.0f) * PIXELS_PER_METER;
-         body->AddForce(wind);
+//         Vec2 weight = Vec2(0.0f, body->mass * 9.8f * PIXELS_PER_METER);
+//         body->AddForce(weight);
+//
+//         Vec2 wind = Vec2(20.0f, 0.0f) * PIXELS_PER_METER;
+//         body->AddForce(wind);
 
          float torque = 0.0f;
          body->AddTorque(torque);
@@ -150,8 +135,13 @@ void Application::Update()
             Body* a = bodies[i];
             Body* b = bodies[j];
 
-            if(CollisionDetection::IsColliding(a, b))
+            Contact contact;
+
+            if(CollisionDetection::IsColliding(a, b, contact))
             {
+                Graphics::DrawFillCircle(contact.start.x, contact.start.y, 3, 0xFFFF00FF);
+                Graphics::DrawFillCircle(contact.end.x, contact.end.y, 3, 0xFFFF00FF);
+                Graphics::DrawLine(contact.start.x, contact.start.y, contact.start.x + contact.normal.x * contact.depth, contact.start.y + contact.normal.y * contact.depth, 0xFFFF00FF);
                 a->isColliding = true;
                 b->isColliding = true;
             }
@@ -196,7 +186,7 @@ void Application::Update()
 
 void Application::Render()
 {
-    Graphics::ClearScreen(0xFF056263);
+//    Graphics::ClearScreen(0xFF056263);
 
     if(leftMouseButtonDown)
     {
