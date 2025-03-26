@@ -138,15 +138,17 @@ void Application::Update()
         body->Update(deltaTime);
     }
 
+    for(Body* body: bodies)
+    {
+        body->isColliding = false;
+    }
+
     for(int i = 0; i < bodies.size() - 1; i++)
     {
         for(int j = i + 1; j < bodies.size(); j++)
         {
             Body* a = bodies[i];
             Body* b = bodies[j];
-
-            a->isColliding = false;
-            b->isColliding = false;
 
             if(CollisionDetection::IsColliding(a, b))
             {
