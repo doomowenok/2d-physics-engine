@@ -2,6 +2,7 @@
 #include "Physics/Constants.h"
 #include "Graphics.h"
 #include "Physics/Force.h"
+#include "Physics/CollisionDetection.h"
 
 bool Application::IsRunning()
 {
@@ -14,8 +15,11 @@ void Application::Setup()
 
     anchor = Vec2(Graphics::Width() / 2.0f, 30.0f);
 
-    Body* box = new Body(BoxShape(200, 100), Graphics::Width() / 2, Graphics::Height() / 2, 1.0f);
-    bodies.push_back(box);
+    Body* ball0 = new Body(CircleShape(50), 100, 100, 1.0f);
+    bodies.push_back(ball0);
+
+    Body* ball1 = new Body(CircleShape(100), 500, 100, 1.0f);
+    bodies.push_back(ball1);
 }
 
 void Application::Input()
@@ -119,16 +123,37 @@ void Application::Update()
 
     for(Body* body: bodies)
     {
-        // Vec2 weight = Vec2(0.0f, body->mass * 9.8f * PIXELS_PER_METER);
-        // body->AddForce(weight);
+         Vec2 weight = Vec2(0.0f, body->mass * 9.8f * PIXELS_PER_METER);
+         body->AddForce(weight);
 
-         float torque = 2000.0f;
+         Vec2 wind = Vec2(20.0f, 0.0f) * PIXELS_PER_METER;
+         body->AddForce(wind);
+
+         float torque = 0.0f;
          body->AddTorque(torque);
     }
 
     for(Body* body: bodies)
     {
         body->Update(deltaTime);
+    }
+
+    for(int i = 0; i < bodies.size() - 1; i++)
+    {
+        for(int j = i + 1; j < bodies.size(); j++)
+        {
+            Body* a = bodies[i];
+            Body* b = bodies[j];
+
+            a->isColliding = false;
+            b->isColliding = false;
+
+            if(CollisionDetection::IsColliding(a, b))
+            {
+                a->isColliding = true;
+                b->isColliding = true;
+            }
+        }
     }
 
     for(Body* body: bodies)
@@ -183,15 +208,17 @@ void Application::Render()
 
     for(Body* body: bodies)
     {
+        uint32_t color = body->isColliding ? 0xFF0000FF : 0xFFFFFFFF;
+
         if(body->shape->GetType() == CIRCLE)
         {
             CircleShape* circleShape = (CircleShape*) body->shape;
-            Graphics::DrawCircle(body->position.x, body->position.y, circleShape->radius, body->rotation, 0xFFFFFFFF);
+            Graphics::DrawCircle(body->position.x, body->position.y, circleShape->radius, body->rotation, color);
         }
         else if (body->shape->GetType() == BOX)
         {
             BoxShape* boxShape = (BoxShape*) body->shape;
-            Graphics::DrawPolygon(body->position.x, body->position.y, boxShape->worldVertices, 0xFFFFFFFF);
+            Graphics::DrawPolygon(body->position.x, body->position.y, boxShape->worldVertices, color);
         }
     }
 
