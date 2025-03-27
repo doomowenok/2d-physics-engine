@@ -144,6 +144,8 @@ void Application::Update()
                 Graphics::DrawLine(contact.start.x, contact.start.y, contact.start.x + contact.normal.x * contact.depth, contact.start.y + contact.normal.y * contact.depth, 0xFFFF00FF);
                 a->isColliding = true;
                 b->isColliding = true;
+
+                contact.ResolvePenetration();
             }
         }
     }
