@@ -1,4 +1,5 @@
 #include "Body.h"
+#include <cmath>
 
 Body::Body(const Shape& shape, float x, float y, float mass)
 {
@@ -20,6 +21,12 @@ Body::Body(const Shape& shape, float x, float y, float mass)
 Body::~Body()
 {
     delete shape;
+}
+
+bool Body::IsStatic() const
+{
+    const float MASS_EPSILON = 0.005f;
+    return fabsf(inverseMass - 0.0f) < MASS_EPSILON;
 }
 
 void Body::AddForce(const Vec2& force)
