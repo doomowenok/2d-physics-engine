@@ -51,6 +51,11 @@ void Body::ClearTorque()
 
 void Body::IntegrateLinear(float deltaTime)
 {
+    if(IsStatic())
+    {
+        return;
+    }
+
     // acceleration = sumForces / mass;
     acceleration = sumForces * inverseMass;
 
