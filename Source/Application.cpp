@@ -14,13 +14,8 @@ void Application::Setup()
 {
     running = Graphics::OpenWindow();
 
-    anchor = Vec2(Graphics::Width() / 2.0f, 30.0f);
-
-    Body* ball0 = new Body(CircleShape(100), 200, 200, 1.0f);
-    bodies.push_back(ball0);
-
-    Body* ball1 = new Body(CircleShape(50), 500, 100, 1.0f);
-    bodies.push_back(ball1);
+    Body* ball = new Body(CircleShape(250), Graphics::Width() / 2, Graphics::Height() / 2, 0.0f, 1.0f);
+    bodies.push_back(ball);
 }
 
 void Application::Input()
@@ -38,47 +33,13 @@ void Application::Input()
                 {
                     running = false;
                 }
-                if(event.key.keysym.sym == SDLK_UP)
-                {
-                    pushForce.y = 50.0 * PIXELS_PER_METER;
-                }
-                if(event.key.keysym.sym == SDLK_RIGHT)
-                {
-                    pushForce.x = 50.0 * PIXELS_PER_METER;
-                }
-                if(event.key.keysym.sym == SDLK_DOWN)
-                {
-                    pushForce.y = -50.0 * PIXELS_PER_METER;
-                }
-                if(event.key.keysym.sym == SDLK_LEFT)
-                {
-                    pushForce.x = -50.0 * PIXELS_PER_METER;
-                }
                 break;
-            case SDL_KEYUP:
-                if(event.key.keysym.sym == SDLK_UP)
-                {
-                    pushForce.y = 0.0f;
-                }
-                if(event.key.keysym.sym == SDLK_RIGHT)
-                {
-                    pushForce.x = 0.0f;
-                }
-                if(event.key.keysym.sym == SDLK_DOWN)
-                {
-                    pushForce.y = 0.0f;
-                }
-                if(event.key.keysym.sym == SDLK_LEFT)
-                {
-                    pushForce.x = 0.0f;
-                }
-                break;
-            case SDL_MOUSEMOTION:
+            case SDL_MOUSEBUTTONDOWN:
                 int x;
                 int y;
                 SDL_GetMouseState(&x, &y);
-                bodies[0]->position.x = x;
-                bodies[0]->position.y = y;
+                Body* ball = new Body(CircleShape(20), x, y, 1.0f, 0.9f);
+                bodies.push_back(ball);
                 break;
         }
     }
@@ -108,11 +69,11 @@ void Application::Update()
 
     for(Body* body: bodies)
     {
-//         Vec2 weight = Vec2(0.0f, body->mass * 9.8f * PIXELS_PER_METER);
-//         body->AddForce(weight);
-//
-//         Vec2 wind = Vec2(20.0f, 0.0f) * PIXELS_PER_METER;
-//         body->AddForce(wind);
+         Vec2 weight = Vec2(0.0f, body->mass * 9.8f * PIXELS_PER_METER);
+         body->AddForce(weight);
+
+         Vec2 wind = Vec2(2.0f, 0.0f) * PIXELS_PER_METER;
+         body->AddForce(wind);
 
          float torque = 0.0f;
          body->AddTorque(torque);
@@ -139,13 +100,10 @@ void Application::Update()
 
             if(CollisionDetection::IsColliding(a, b, contact))
             {
-                Graphics::DrawFillCircle(contact.start.x, contact.start.y, 3, 0xFFFF00FF);
-                Graphics::DrawFillCircle(contact.end.x, contact.end.y, 3, 0xFFFF00FF);
-                Graphics::DrawLine(contact.start.x, contact.start.y, contact.start.x + contact.normal.x * contact.depth, contact.start.y + contact.normal.y * contact.depth, 0xFFFF00FF);
+                contact.ResolveCollision();
+
                 a->isColliding = true;
                 b->isColliding = true;
-
-                contact.ResolvePenetration();
             }
         }
     }

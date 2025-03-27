@@ -1,7 +1,7 @@
 #include "Body.h"
 #include <cmath>
 
-Body::Body(const Shape& shape, float x, float y, float mass)
+Body::Body(const Shape& shape, float x, float y, float mass, float restitution)
 {
     this->shape = shape.Clone();
     this->position = Vec2(x, y);
@@ -16,6 +16,7 @@ Body::Body(const Shape& shape, float x, float y, float mass)
     this->inverseMass = mass == 0.0f ? 0.0f : 1.0f / mass;
     this->I = shape.GetMomentOfInertia() * mass;
     this->inverseI = I == 0.0f ? 0.0f : 1.0f / I;
+    this->restitution = restitution;
 }
 
 Body::~Body()
@@ -47,6 +48,16 @@ void Body::ClearForces()
 void Body::ClearTorque()
 {
     sumTorque = 0.0f;
+}
+
+void Body::ApplyImpulse(const Vec2& impulse)
+{
+    if(IsStatic())
+    {
+        return;
+    }
+
+    velocity += impulse * inverseMass;
 }
 
 void Body::IntegrateLinear(float deltaTime)
