@@ -23,7 +23,7 @@ public:
 
     ~Application() = default;
 
-    bool IsRunning();
+    bool IsRunning() const;
 
     void Setup();
 

@@ -6,9 +6,22 @@ bool CollisionDetection::IsColliding(Body* a, Body* b, Contact& contact)
     bool aIsCircle = a->shape->GetType() == CIRCLE;
     bool bIsCircle = b->shape->GetType() == CIRCLE;
 
+    bool aIsPolygon = a->shape->GetType() == POLYGON || a->shape->GetType() == BOX;
+    bool bIsPolygon = b->shape->GetType() == POLYGON || b->shape->GetType() == BOX;
+
     if(aIsCircle && bIsCircle)
     {
         return IsCollidingCircleCircle(a, b, contact);
+    }
+
+    if(aIsPolygon && bIsPolygon)
+    {
+        return IsCollidingPolygonPolygon(a, b, contact);
+    }
+
+    if((aIsCircle && bIsPolygon) || (aIsPolygon && bIsCircle))
+    {
+        return IsCollidingPolygonCircle(a, b, contact);
     }
 
     return false;
@@ -41,4 +54,22 @@ bool CollisionDetection::IsCollidingCircleCircle(Body* a, Body* b, Contact& cont
     contact.depth = (contact.end - contact.start).Magnitude();
 
     return true;
+}
+
+float FindMinimimSeparation(const PolygonShape& a, const PolygonShape& b)
+{
+
+}
+
+bool CollisionDetection::IsCollidingPolygonPolygon(Body* a, Body* b, Contact& contact)
+{
+    const PolygonShape* aPolygonShape = (PolygonShape*) a->shape;
+    const PolygonShape* bPolygonShape = (PolygonShape*) b->shape;
+
+
+}
+
+bool CollisionDetection::IsCollidingPolygonCircle(Body* a, Body* b, Contact& contact)
+{
+    return false;
 }
