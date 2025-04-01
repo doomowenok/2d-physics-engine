@@ -48,6 +48,8 @@ struct PolygonShape : public Shape
 
     float GetMomentOfInertia() const override;
 
+    Vec2 EdgeAt(int index) const;
+
     // Object -> World
     void UpdateVertices(float angle, const Vec2& position);
 };

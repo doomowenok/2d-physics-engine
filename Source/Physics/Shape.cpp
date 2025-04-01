@@ -50,6 +50,13 @@ float PolygonShape::GetMomentOfInertia() const
     return 0.0f;
 }
 
+Vec2 PolygonShape::EdgeAt(int index) const
+{
+    int currentVertex = index;
+    int nextVertex = (index + 1) % worldVertices.size();
+    return worldVertices[nextVertex] - worldVertices[currentVertex];
+}
+
 void PolygonShape::UpdateVertices(float angle, const Vec2& position)
 {
     for(int i = 0; i < localVertices.size(); i++)
