@@ -57,6 +57,30 @@ Vec2 PolygonShape::EdgeAt(int index) const
     return worldVertices[nextVertex] - worldVertices[currentVertex];
 }
 
+float PolygonShape::FindMinimimSeparation(const PolygonShape* other) const
+{
+    float separation = std::numeric_limits<float>::lowest();
+
+    for (int i = 0; i < worldVertices.size(); i++)
+    {
+        Vec2 va = worldVertices[i];
+        Vec2 normal = EdgeAt(i).Normal();
+
+        float minimumSeparation = std::numeric_limits<float>::max();
+
+        for (int j = 0; j < other->worldVertices.size(); j++)
+        {
+            Vec2 vb = other->worldVertices[j];
+            float projection = (vb - va).Dot(normal);
+            minimumSeparation = std::min(minimumSeparation, projection);
+        }
+
+        separation = std::max(separation, minimumSeparation);
+    }
+
+    return separation;
+}
+
 void PolygonShape::UpdateVertices(float angle, const Vec2& position)
 {
     for(int i = 0; i < localVertices.size(); i++)
