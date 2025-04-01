@@ -49,7 +49,7 @@ struct PolygonShape : public Shape
     float GetMomentOfInertia() const override;
 
     Vec2 EdgeAt(int index) const;
-    float FindMinimimSeparation(const PolygonShape* other) const;
+    float FindMinimimSeparation(const PolygonShape* other, Vec2& axis, Vec2& point) const;
 
     // Object -> World
     void UpdateVertices(float angle, const Vec2& position);

@@ -62,8 +62,21 @@ bool CollisionDetection::IsCollidingPolygonPolygon(Body* a, Body* b, Contact& co
     const PolygonShape* aPolygonShape = (PolygonShape*) a->shape;
     const PolygonShape* bPolygonShape = (PolygonShape*) b->shape;
 
-    if (aPolygonShape->FindMinimimSeparation(bPolygonShape) >= 0
-        || bPolygonShape->FindMinimimSeparation(aPolygonShape) >= 0)
+    Vec2 aAxis;
+    Vec2 bAxis;
+    Vec2 aPoint;
+    Vec2 bPoint;
+
+    float abSeparation = aPolygonShape->FindMinimimSeparation(bPolygonShape, aAxis, aPoint);
+
+    if (abSeparation >= 0)
+    {
+        return false;
+    }
+
+    float baSeparation = bPolygonShape->FindMinimimSeparation(aPolygonShape, bAxis, bPoint);
+
+    if (baSeparation >= 0)
     {
         return false;
     }
