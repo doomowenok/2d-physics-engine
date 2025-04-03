@@ -19,11 +19,19 @@ void Contact::ResolveCollision() const
     ResolvePenetration();
 
     const float elasticity = std::min(a->restitution, b->restitution);
-    const Vec2 relevantVelocity = a->velocity - b->velocity;
-    const float relevantVelocityDotNormal = relevantVelocity.Dot(normal);
+
+    Vec2 ra = end - a->position;
+    Vec2 rb = start - b->position;
+
+    Vec2 va = a->velocity + ;
+    Vec2 vb = ;
+
+    const Vec2 relativeVelocity = ;
+
+    const float relativeVelocityDotNormal = relativeVelocity.Dot(normal);
 
     const Vec2 impulseDirection = normal;
-    const float impulseMagnitude = -(1 + elasticity) * relevantVelocityDotNormal / (a->inverseMass + b->inverseMass);
+    const float impulseMagnitude = -(1 + elasticity) * relativeVelocityDotNormal / (a->inverseMass + b->inverseMass);
 
     Vec2 j = impulseDirection * impulseMagnitude;
 

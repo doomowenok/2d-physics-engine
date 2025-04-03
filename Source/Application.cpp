@@ -14,13 +14,12 @@ void Application::Setup()
 {
     running = Graphics::OpenWindow();
 
-    Body* boxA = new Body(BoxShape(200, 200), Graphics::Width() / 2, Graphics::Height() / 2, 1.0f, 1.0f);
-    boxA->angularVelocity = 0.4f;
-    bodies.push_back(boxA);
+    Body* floor = new Body(BoxShape(Graphics::Width() - 50, 50), Graphics::Width() / 2.0f, Graphics::Height() - 150, 0.0f, 0.2f);
+    bodies.push_back(floor);
 
-    Body* boxB = new Body(BoxShape(200, 200), Graphics::Width() / 2, Graphics::Height() / 2, 1.0f, 1.0f);
-    boxB->angularVelocity = 0.1f;
-    bodies.push_back(boxB);
+    Body* box = new Body(BoxShape(200, 200), Graphics::Width() / 2.0f, Graphics::Height() / 2.0f, 2.0f, 0.5f);
+    box->rotation = 1.4f;
+    bodies.push_back(box);
 }
 
 void Application::Input()
@@ -43,8 +42,8 @@ void Application::Input()
                 int x;
                 int y;
                 SDL_GetMouseState(&x, &y);
-                bodies[0]->position.x = x;
-                bodies[0]->position.y = y;
+                // bodies[0]->position.x = x;
+                // bodies[0]->position.y = y;
                 break;
         }
     }
@@ -74,8 +73,8 @@ void Application::Update()
 
     for (Body* body: bodies)
     {
-        // Vec2 weight = Vec2(0.0f, body->mass * 9.8f * PIXELS_PER_METER);
-        // body->AddForce(weight);
+        Vec2 weight = Vec2(0.0f, body->mass * 9.8f * PIXELS_PER_METER);
+        body->AddForce(weight);
 
         // Vec2 wind = Vec2(2.0f, 0.0f) * PIXELS_PER_METER;
         // body->AddForce(wind);
@@ -105,7 +104,7 @@ void Application::Update()
 
             if (CollisionDetection::IsColliding(a, b, contact))
             {
-                // contact.ResolveCollision();
+                contact.ResolveCollision();
 
                 a->isColliding = true;
                 b->isColliding = true;
