@@ -50,6 +50,7 @@ void Body::ClearTorque()
     sumTorque = 0.0f;
 }
 
+// Only linear
 void Body::ApplyImpulse(const Vec2& impulse)
 {
     if(IsStatic())
@@ -58,6 +59,18 @@ void Body::ApplyImpulse(const Vec2& impulse)
     }
 
     velocity += impulse * inverseMass;
+}
+
+// Linear + Angular
+void Body::ApplyImpulse(const Vec2& impulse, const Vec2& r)
+{
+    if(IsStatic())
+    {
+        return;
+    }
+
+    velocity += impulse * inverseMass;
+    angularVelocity += r.Cross(impulse) * inverseI;
 }
 
 void Body::IntegrateLinear(float deltaTime)

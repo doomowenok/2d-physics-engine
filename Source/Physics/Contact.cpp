@@ -23,18 +23,21 @@ void Contact::ResolveCollision() const
     Vec2 ra = end - a->position;
     Vec2 rb = start - b->position;
 
-    Vec2 va = a->velocity + ;
-    Vec2 vb = ;
+    // Linear + Angular velocities
+    Vec2 va = a->velocity + Vec2(-a->angularVelocity * ra.y, a->angularVelocity * ra.x);
+    Vec2 vb = b->velocity + Vec2(-b->angularVelocity * rb.y, b->angularVelocity * rb.x);
 
-    const Vec2 relativeVelocity = ;
+    const Vec2 relativeVelocity = va - vb;
 
     const float relativeVelocityDotNormal = relativeVelocity.Dot(normal);
 
     const Vec2 impulseDirection = normal;
-    const float impulseMagnitude = -(1 + elasticity) * relativeVelocityDotNormal / (a->inverseMass + b->inverseMass);
+    const float impulseMagnitude =
+        -(1 + elasticity) * relativeVelocityDotNormal
+        / ((a->inverseMass + b->inverseMass) + ra.Cross(normal) * ra.Cross(normal) * a->inverseI + rb.Cross(normal) * rb.Cross(normal) * b->inverseI);
 
     Vec2 j = impulseDirection * impulseMagnitude;
 
-    a->ApplyImpulse(j);
-    b->ApplyImpulse(-j);
+    a->ApplyImpulse(j, ra);
+    b->ApplyImpulse(-j, rb);
 }

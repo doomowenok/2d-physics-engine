@@ -14,10 +14,20 @@ void Application::Setup()
 {
     running = Graphics::OpenWindow();
 
-    Body* floor = new Body(BoxShape(Graphics::Width() - 50, 50), Graphics::Width() / 2.0f, Graphics::Height() - 150, 0.0f, 0.2f);
+    Body* floor = new Body(
+        BoxShape(Graphics::Width() - 50, 50),
+        Graphics::Width() / 2.0f,
+        Graphics::Height() - 150,
+        0.0f,
+        1.0f);
     bodies.push_back(floor);
 
-    Body* box = new Body(BoxShape(200, 200), Graphics::Width() / 2.0f, Graphics::Height() / 2.0f, 2.0f, 0.5f);
+    Body* box = new Body(
+        BoxShape(200, 200),
+        Graphics::Width() / 2.0f,
+        Graphics::Height() / 2.0f,
+        20.0f,
+        1.0f);
     box->rotation = 1.4f;
     bodies.push_back(box);
 }
