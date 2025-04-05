@@ -1,7 +1,7 @@
 #include "Body.h"
 #include <cmath>
 
-Body::Body(const Shape& shape, float x, float y, float mass, float restitution)
+Body::Body(const Shape& shape, float x, float y, float mass, float restitution, float friction)
 {
     this->shape = shape.Clone();
     this->position = Vec2(x, y);
@@ -17,6 +17,7 @@ Body::Body(const Shape& shape, float x, float y, float mass, float restitution)
     this->I = shape.GetMomentOfInertia() * mass;
     this->inverseI = I == 0.0f ? 0.0f : 1.0f / I;
     this->restitution = restitution;
+    this->friction = friction;
 }
 
 Body::~Body()

@@ -14,22 +14,40 @@ void Application::Setup()
 {
     running = Graphics::OpenWindow();
 
+    // Add floor and walls to contain objects inside the screen
     Body* floor = new Body(
         BoxShape(Graphics::Width() - 50, 50),
-        Graphics::Width() / 2.0f,
-        Graphics::Height() - 150,
+        Graphics::Width() / 2.0,
+        Graphics::Height() - 50,
         0.0f,
-        1.0f);
-    bodies.push_back(floor);
+        0.2f,
+        0.7f);
+    Body* leftWall = new Body(
+        BoxShape(50, Graphics::Height() - 100),
+        50, Graphics::Height() / 2.0 - 25,
+        0.0f,
+        0.2f,
+        0.7f);
+    Body* rightWall = new Body(
+        BoxShape(50, Graphics::Height() - 100),
+        Graphics::Width() - 50,
+        Graphics::Height() / 2.0 - 25,
+        0.0f,
+        0.2f,
+        0.7f);
 
-    Body* box = new Body(
-        BoxShape(200, 200),
-        Graphics::Width() / 2.0f,
-        Graphics::Height() / 2.0f,
-        20.0f,
-        1.0f);
-    box->rotation = 1.4f;
-    bodies.push_back(box);
+    bodies.push_back(floor);
+    bodies.push_back(leftWall);
+    bodies.push_back(rightWall);
+
+    Body* bigBall = new Body(
+        CircleShape(200),
+        Graphics::Width() / 2.0,
+        Graphics::Height() / 2.0,
+        0.0f,
+        0.2f,
+        0.7f);
+    bodies.push_back(bigBall);
 }
 
 void Application::Input()
@@ -48,12 +66,11 @@ void Application::Input()
                     running = false;
                 }
                 break;
-            case SDL_MOUSEMOTION:
-                int x;
-                int y;
+            case SDL_MOUSEBUTTONDOWN:
+                int x, y;
                 SDL_GetMouseState(&x, &y);
-                // bodies[0]->position.x = x;
-                // bodies[0]->position.y = y;
+                Body* ball = new Body(CircleShape(50), x, y, 1.0, 0.2f, 0.7f);
+                bodies.push_back(ball);
                 break;
         }
     }
