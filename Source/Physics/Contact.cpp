@@ -38,7 +38,7 @@ void Contact::ResolveCollision() const
     Vec2 impulseAlongNormal = impulseNormalDirection * impulseNormalMagnitude;
 
     const Vec2 tangent = normal.Normal();
-    float relativeVelocityDotTangent = relativeVelocity.Dot(tangent);
+    const float relativeVelocityDotTangent = relativeVelocity.Dot(tangent);
     const Vec2 impulseTangentDirection = tangent;
     const float impulseTangentMagnitude =
         friction * -(1 + elasticity) * relativeVelocityDotTangent

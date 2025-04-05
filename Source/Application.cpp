@@ -14,7 +14,6 @@ void Application::Setup()
 {
     running = Graphics::OpenWindow();
 
-    // Add floor and walls to contain objects inside the screen
     Body* floor = new Body(
         BoxShape(Graphics::Width() - 50, 50),
         Graphics::Width() / 2.0,
@@ -139,41 +138,6 @@ void Application::Update()
                 Graphics::DrawFillCircle(contact.end.x, contact.end.y, 3, 0xFFFF00FF);
                 Graphics::DrawLine(contact.start.x, contact.start.y, contact.start.x + contact.normal.x * 15,
                                    contact.start.y + contact.normal.y * 15, 0xFFFF00FF);
-            }
-        }
-    }
-
-    for (Body* body: bodies)
-    {
-        if (body->shape->GetType() == CIRCLE)
-        {
-            CircleShape* circleShape = (CircleShape *) body->shape;
-
-            if (!circleShape)
-            {
-                continue;
-            }
-
-            if (body->position.x - circleShape->radius <= 0)
-            {
-                body->position.x = circleShape->radius;
-                body->velocity.x *= -0.9f;
-            }
-            else if (body->position.x + circleShape->radius >= Graphics::Width())
-            {
-                body->position.x = Graphics::Width() - circleShape->radius;
-                body->velocity.x *= -0.9f;
-            }
-
-            if (body->position.y - circleShape->radius <= 0)
-            {
-                body->position.y = circleShape->radius;
-                body->velocity.y *= -0.9f;
-            }
-            else if (body->position.y + circleShape->radius >= Graphics::Height())
-            {
-                body->position.y = Graphics::Height() - circleShape->radius;
-                body->velocity.y *= -0.9f;
             }
         }
     }
