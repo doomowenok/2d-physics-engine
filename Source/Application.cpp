@@ -35,18 +35,27 @@ void Application::Setup()
         0.2f,
         0.7f);
 
-    bodies.push_back(floor);
-    bodies.push_back(leftWall);
-    bodies.push_back(rightWall);
+    // bodies.push_back(floor);
+    // bodies.push_back(leftWall);
+    // bodies.push_back(rightWall);
 
-    Body* bigBall = new Body(
-        CircleShape(200),
+    Body* bigBox = new Body(
+        BoxShape(200, 200),
         Graphics::Width() / 2.0,
         Graphics::Height() / 2.0,
         0.0f,
         0.2f,
         0.7f);
-    bodies.push_back(bigBall);
+    bodies.push_back(bigBox);
+
+    Body* ball = new Body(
+        CircleShape(50),
+        Graphics::Width() / 2.0,
+        Graphics::Height() / 2.0,
+        1.0f,
+        0.1f,
+        0.7f);
+    bodies.push_back(ball);
 }
 
 void Application::Input()
@@ -65,11 +74,17 @@ void Application::Input()
                     running = false;
                 }
                 break;
-            case SDL_MOUSEBUTTONDOWN:
+            // case SDL_MOUSEBUTTONDOWN:
+            //     int x, y;
+            //     SDL_GetMouseState(&x, &y);
+            //     Body* ball = new Body(CircleShape(50), x, y, 1.0, 0.2f, 0.7f);
+            //     bodies.push_back(ball);
+            //     break;
+            case SDL_MOUSEMOTION:
                 int x, y;
                 SDL_GetMouseState(&x, &y);
-                Body* ball = new Body(CircleShape(50), x, y, 1.0, 0.2f, 0.7f);
-                bodies.push_back(ball);
+                bodies[1]->position.x = x;
+                bodies[1]->position.y = y;
                 break;
         }
     }
@@ -99,8 +114,8 @@ void Application::Update()
 
     for (Body* body: bodies)
     {
-        Vec2 weight = Vec2(0.0f, body->mass * 9.8f * PIXELS_PER_METER);
-        body->AddForce(weight);
+        // Vec2 weight = Vec2(0.0f, body->mass * 9.8f * PIXELS_PER_METER);
+        // body->AddForce(weight);
 
         // Vec2 wind = Vec2(2.0f, 0.0f) * PIXELS_PER_METER;
         // body->AddForce(wind);

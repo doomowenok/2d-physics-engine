@@ -20,9 +20,14 @@ bool CollisionDetection::IsColliding(Body* a, Body* b, Contact &contact)
         return IsCollidingPolygonPolygon(a, b, contact);
     }
 
-    if ((aIsCircle && bIsPolygon) || (aIsPolygon && bIsCircle))
+    if(aIsPolygon && bIsCircle)
     {
         return IsCollidingPolygonCircle(a, b, contact);
+    }
+
+    if(aIsCircle && bIsPolygon)
+    {
+        return IsCollidingPolygonCircle(b, a, contact);
     }
 
     return false;
@@ -102,7 +107,11 @@ bool CollisionDetection::IsCollidingPolygonPolygon(Body* a, Body* b, Contact &co
     return true;
 }
 
-bool CollisionDetection::IsCollidingPolygonCircle(Body* a, Body* b, Contact &contact)
+bool CollisionDetection::IsCollidingPolygonCircle(Body* polygon, Body* circle, Contact &contact)
 {
+    const PolygonShape* polygonShape = (PolygonShape *) polygon->shape;
+    const CircleShape* circleShape = (CircleShape *) circle->shape;
+
+
     return false;
 }
