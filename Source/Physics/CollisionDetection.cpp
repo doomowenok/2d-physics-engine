@@ -22,12 +22,12 @@ bool CollisionDetection::IsColliding(Body* a, Body* b, Contact &contact)
         return IsCollidingPolygonPolygon(a, b, contact);
     }
 
-    if(aIsPolygon && bIsCircle)
+    if (aIsPolygon && bIsCircle)
     {
         return IsCollidingPolygonCircle(a, b, contact);
     }
 
-    if(aIsCircle && bIsPolygon)
+    if (aIsCircle && bIsPolygon)
     {
         return IsCollidingPolygonCircle(b, a, contact);
     }
@@ -111,13 +111,14 @@ bool CollisionDetection::IsCollidingPolygonPolygon(Body* a, Body* b, Contact &co
 
 bool CollisionDetection::IsCollidingPolygonCircle(Body* polygon, Body* circle, Contact &contact)
 {
-    const PolygonShape* polygonShape = (PolygonShape *) polygon->shape;
-    const CircleShape* circleShape = (CircleShape *) circle->shape;
+    const PolygonShape* polygonShape = static_cast<PolygonShape *>(polygon->shape);
+    const CircleShape* circleShape = static_cast<CircleShape *>(circle->shape);
+    const std::vector<Vec2> &polygonVertices = polygonShape->worldVertices;
 
-    const std::vector<Vec2>& polygonVertices = polygonShape->worldVertices;
-
+    bool isOutside = false;
     Vec2 minCurrentVertex;
     Vec2 minNextVertex;
+    float distanceCircleEdge = std::numeric_limits<float>::lowest();
 
     for (int i = 0; i < polygonVertices.size(); i++)
     {
@@ -127,20 +128,97 @@ bool CollisionDetection::IsCollidingPolygonCircle(Body* polygon, Body* circle, C
         Vec2 edge = polygonShape->EdgeAt(currentVertex);
         Vec2 normal = edge.Normal();
 
-        Vec2 circleCenter = circle->position - polygonVertices[currentVertex];
+        Vec2 vertexToCircleCenter = circle->position - polygonVertices[currentVertex];
+        const float projection = vertexToCircleCenter.Dot(normal);
 
-        const  float projection = circleCenter.Dot(normal);
-
-        if(projection > 0)
+        if (projection > 0)
         {
+            distanceCircleEdge = projection;
             minCurrentVertex = polygonShape->worldVertices[currentVertex];
             minNextVertex = polygonShape->worldVertices[nextVertex];
+            isOutside = true;
             break;
+        }
+        else
+        {
+            if (projection > distanceCircleEdge)
+            {
+                distanceCircleEdge = projection;
+                minCurrentVertex = polygonVertices[currentVertex];
+                minNextVertex = polygonVertices[nextVertex];
+            }
         }
     }
 
-    Graphics::DrawFillCircle(minCurrentVertex.x, minCurrentVertex.y, 5, 0xFF00FFFF);
-    Graphics::DrawFillCircle(minNextVertex.x, minNextVertex.y, 5, 0xFF00FFFF);
+    if (isOutside)
+    {
+        Vec2 v1 = circle->position - minCurrentVertex;
+        Vec2 v2 = minNextVertex - minCurrentVertex;
 
-    return false;
+        if (v1.Dot(v2) < 0)
+        {
+            if (v1.Magnitude() > circleShape->radius)
+            {
+                return false;
+            }
+            else
+            {
+                contact.a = polygon;
+                contact.b = circle;
+                contact.depth = circleShape->radius - v1.Magnitude();
+                contact.normal = v1.Normalize();
+                contact.start = circle->position + (contact.normal * -circleShape->radius);
+                contact.end = contact.start + (contact.normal * contact.depth);
+            }
+        }
+        else
+        {
+            v1 = circle->position - minNextVertex;
+            v2 = minCurrentVertex - minNextVertex;
+
+            if (v1.Dot(v2) < 0)
+            {
+                if (v1.Magnitude() > circleShape->radius)
+                {
+                    return false;
+                }
+                else
+                {
+                    contact.a = polygon;
+                    contact.b = circle;
+                    contact.depth = circleShape->radius - v1.Magnitude();
+                    contact.normal = v1.Normalize();
+                    contact.start = circle->position + (contact.normal * -circleShape->radius);
+                    contact.end = contact.start + (contact.normal * contact.depth);
+                }
+            }
+            else
+            {
+                if (distanceCircleEdge > circleShape->radius)
+                {
+                    return false;
+                }
+                else
+                {
+                    contact.a = polygon;
+                    contact.b = circle;
+                    contact.depth = circleShape->radius - distanceCircleEdge;
+                    contact.normal = (minNextVertex - minCurrentVertex).Normal();
+                    contact.start = circle->position - (contact.normal * circleShape->radius);
+                    contact.end = contact.start + (contact.normal * contact.depth);
+                }
+            }
+        }
+    }
+    else
+    {
+        contact.a = polygon;
+        contact.b = circle;
+        contact.depth = circleShape->radius - distanceCircleEdge;
+        contact.normal = (minNextVertex - minCurrentVertex).Normal();
+        contact.start = circle->position - (contact.normal * circleShape->radius);
+        contact.end = contact.start + (contact.normal * contact.depth);
+    }
+
+    return true;
 }
