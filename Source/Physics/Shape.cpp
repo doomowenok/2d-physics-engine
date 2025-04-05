@@ -5,10 +5,7 @@ CircleShape::CircleShape(const float radius)
     this->radius = radius;
 }
 
-CircleShape::~CircleShape()
-{
-
-}
+CircleShape::~CircleShape() {}
 
 ShapeType CircleShape::GetType() const
 {
@@ -27,13 +24,14 @@ float CircleShape::GetMomentOfInertia() const
 
 PolygonShape::PolygonShape(const std::vector<Vec2> vertices)
 {
-
+    for (Vec2 vertex: vertices)
+    {
+        localVertices.push_back(vertex);
+        worldVertices.push_back(vertex);
+    }
 }
 
-PolygonShape::~PolygonShape()
-{
-
-}
+PolygonShape::~PolygonShape() {}
 
 ShapeType PolygonShape::GetType() const
 {
@@ -47,13 +45,13 @@ Shape* PolygonShape::Clone() const
 
 float PolygonShape::GetMomentOfInertia() const
 {
-    return 0.0f;
+    return 5000.0f;
 }
 
 Vec2 PolygonShape::EdgeAt(int index) const
 {
-    int currentVertex = index;
-    int nextVertex = (index + 1) % worldVertices.size();
+    const int currentVertex = index;
+    const int nextVertex = (index + 1) % worldVertices.size();
     return worldVertices[nextVertex] - worldVertices[currentVertex];
 }
 
@@ -96,9 +94,9 @@ float PolygonShape::FindMinimimSeparation(const PolygonShape* other, Vec2& axis,
     return separation;
 }
 
-void PolygonShape::UpdateVertices(float angle, const Vec2& position)
+void PolygonShape::UpdateVertices(const float angle, const Vec2& position)
 {
-    for(int i = 0; i < localVertices.size(); i++)
+    for (int i = 0; i < localVertices.size(); i++)
     {
         worldVertices[i] = localVertices[i].Rotate(angle);
         worldVertices[i] += position;
@@ -121,10 +119,7 @@ BoxShape::BoxShape(float width, float height)
     worldVertices.push_back(Vec2(-(width / 2.0f), +(height / 2.0f)));
 }
 
-BoxShape::~BoxShape()
-{
-
-}
+BoxShape::~BoxShape() {}
 
 ShapeType BoxShape::GetType() const
 {

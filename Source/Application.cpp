@@ -19,7 +19,7 @@ void Application::Setup()
         Graphics::Width() / 2.0,
         Graphics::Height() - 50,
         0.0f,
-        0.2f,
+        1.0f,
         0.7f);
     Body* leftWall = new Body(
         BoxShape(50, Graphics::Height() - 100),
@@ -47,15 +47,6 @@ void Application::Setup()
         0.2f,
         0.7f);
     bodies.push_back(bigBox);
-
-    Body* ball = new Body(
-        CircleShape(50),
-        Graphics::Width() / 2.0,
-        Graphics::Height() / 2.0,
-        1.0f,
-        0.1f,
-        0.7f);
-    bodies.push_back(ball);
 }
 
 void Application::Input()
@@ -73,19 +64,25 @@ void Application::Input()
                 {
                     running = false;
                 }
+                if (event.key.keysym.sym == SDLK_d)
+                {
+                    debug = !debug;
+                }
                 break;
             case SDL_MOUSEBUTTONDOWN:
                 int x, y;
                 SDL_GetMouseState(&x, &y);
-                Body* ball = new Body(CircleShape(50), x, y, 1.0, 0.2f, 0.7f);
-                bodies.push_back(ball);
+                std::vector<Vec2> vertices =
+                {
+                    Vec2(20, 60),
+                    Vec2(-40, 20),
+                    Vec2(-20, -60),
+                    Vec2(20, -60),
+                    Vec2(40, 20),
+                };
+                Body* polygon = new Body(PolygonShape(vertices), x, y, 2.0f, 0.1f, 0.7f);
+                bodies.push_back(polygon);
                 break;
-            // case SDL_MOUSEMOTION:
-            //     int x, y;
-            //     SDL_GetMouseState(&x, &y);
-            //     bodies[1]->position.x = x;
-            //     bodies[1]->position.y = y;
-            //     break;
         }
     }
 }
@@ -149,10 +146,14 @@ void Application::Update()
 
                 a->isColliding = true;
                 b->isColliding = true;
-                Graphics::DrawFillCircle(contact.start.x, contact.start.y, 3, 0xFFFF00FF);
-                Graphics::DrawFillCircle(contact.end.x, contact.end.y, 3, 0xFFFF00FF);
-                Graphics::DrawLine(contact.start.x, contact.start.y, contact.start.x + contact.normal.x * 15,
-                                   contact.start.y + contact.normal.y * 15, 0xFFFF00FF);
+
+                if (debug)
+                {
+                    Graphics::DrawFillCircle(contact.start.x, contact.start.y, 3, 0xFFFF00FF);
+                    Graphics::DrawFillCircle(contact.end.x, contact.end.y, 3, 0xFFFF00FF);
+                    Graphics::DrawLine(contact.start.x, contact.start.y, contact.start.x + contact.normal.x * 15,
+                                       contact.start.y + contact.normal.y * 15, 0xFFFF00FF);
+                }
             }
         }
     }
@@ -160,31 +161,24 @@ void Application::Update()
 
 void Application::Render()
 {
-    //    Graphics::ClearScreen(0xFF056263);
-
-    if (leftMouseButtonDown)
+    for (const Body* body: bodies)
     {
-        Graphics::DrawLine(
-            bodies[0]->position.x,
-            bodies[0]->position.y,
-            mouseCursor.x,
-            mouseCursor.y,
-            0xFF0000FF);
-    }
-
-    for (Body* body: bodies)
-    {
-        uint32_t color = body->isColliding ? 0xFF0000FF : 0xFFFFFFFF;
-
         if (body->shape->GetType() == CIRCLE)
         {
-            CircleShape* circleShape = static_cast<CircleShape *>(body->shape);
-            Graphics::DrawCircle(body->position.x, body->position.y, circleShape->radius, body->rotation, color);
+            const CircleShape* circleShape = static_cast<CircleShape*>(body->shape);
+            Graphics::DrawCircle(body->position.x, body->position.y, circleShape->radius, body->rotation, 0xFF00FF00);
         }
-        else if (body->shape->GetType() == BOX)
+
+        if (body->shape->GetType() == BOX)
         {
-            BoxShape* boxShape = (BoxShape *) body->shape;
-            Graphics::DrawPolygon(body->position.x, body->position.y, boxShape->worldVertices, color);
+            const BoxShape* boxShape = static_cast<BoxShape*>(body->shape);
+            Graphics::DrawPolygon(body->position.x, body->position.y, boxShape->worldVertices, 0xFF00FF00);
+        }
+
+        if (body->shape->GetType() == POLYGON)
+        {
+            const PolygonShape* polygonShape = static_cast<PolygonShape*>(body->shape);
+            Graphics::DrawPolygon(body->position.x, body->position.y, polygonShape->worldVertices, 0xFF00FF00);
         }
     }
 

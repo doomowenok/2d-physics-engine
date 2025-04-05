@@ -7,16 +7,9 @@
 class Application
 {
 private:
+    bool debug = false;
     bool running = false;
-    std::vector<Body*> bodies;
-    Vec2 pushForce = Vec2(0.0f, 0.0f);
-    Vec2 mouseCursor = Vec2(0.0f, 0.0f);
-    bool leftMouseButtonDown = false;
-
-    Vec2 anchor;
-    float k = 1500.0f;
-    float restLength = 200.0f;
-    const int NUM_PARTICLES = 15;
+    std::vector<Body *> bodies;
 
 public:
     Application() = default;
