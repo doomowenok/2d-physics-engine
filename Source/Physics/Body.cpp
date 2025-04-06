@@ -108,15 +108,7 @@ void Body::Update(float deltaTime)
 {
     IntegrateLinear(deltaTime);
     IntegrateAngular(deltaTime);
-
-    ShapeType shapeType = shape->GetType();
-    bool isPolygon = shapeType == POLYGON || shapeType == BOX;
-
-    if(isPolygon)
-    {
-        PolygonShape* polygonShape = static_cast<PolygonShape*>(shape);
-        polygonShape->UpdateVertices(rotation, position);
-    }
+    shape->UpdateVertices(rotation, position);
 }
 
 void Body::SetTexture(const char* textureFileName)
