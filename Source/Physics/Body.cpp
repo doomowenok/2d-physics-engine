@@ -1,6 +1,5 @@
 #include "Body.h"
 #include <cmath>
-
 #include "../Graphics.h"
 #include "SDL2/SDL_image.h"
 
@@ -26,6 +25,7 @@ Body::Body(const Shape& shape, float x, float y, float mass, float restitution, 
 Body::~Body()
 {
     delete shape;
+    SDL_DestroyTexture(texture);
 }
 
 bool Body::IsStatic() const
