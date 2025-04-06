@@ -1,7 +1,9 @@
 #pragma once
 
+#include "SDL.h"
 #include "Vec2.h"
 #include "Shape.h"
+
 
 struct Body
 {
@@ -28,6 +30,8 @@ struct Body
 
     Shape* shape = nullptr;
 
+    SDL_Texture* texture = nullptr;
+
     Body(const Shape& shape, float x, float y, float mass, float restitution, float friction);
     ~Body();
 
@@ -46,4 +50,6 @@ struct Body
     void IntegrateAngular(float deltaTime);
 
     void Update(float deltaTime);
+
+    void SetTexture(const char* textureFileName);
 };

@@ -1,6 +1,9 @@
 #include "Body.h"
 #include <cmath>
 
+#include "../Graphics.h"
+#include "SDL2/SDL_image.h"
+
 Body::Body(const Shape& shape, float x, float y, float mass, float restitution, float friction)
 {
     this->shape = shape.Clone();
@@ -111,7 +114,18 @@ void Body::Update(float deltaTime)
 
     if(isPolygon)
     {
-        PolygonShape* polygonShape = (PolygonShape*) shape;
+        PolygonShape* polygonShape = static_cast<PolygonShape*>(shape);
         polygonShape->UpdateVertices(rotation, position);
+    }
+}
+
+void Body::SetTexture(const char* textureFileName)
+{
+    SDL_Surface* surface = IMG_Load(textureFileName);
+
+    if(surface)
+    {
+        texture = SDL_CreateTextureFromSurface(Graphics::renderer, surface);
+        SDL_FreeSurface(surface);
     }
 }

@@ -46,7 +46,18 @@ void Application::Setup()
         0.0f,
         0.2f,
         0.7f);
+    bigBox->SetTexture("../Assets/crate.png");
     bodies.push_back(bigBox);
+
+    Body* ball = new Body(
+        CircleShape(100),
+        Graphics::Width() / 2.0 + 400,
+        Graphics::Height() / 2.0 + 100,
+        0.0f,
+        0.2f,
+        0.7f);
+    ball->SetTexture("../Assets/basketball.png");
+    bodies.push_back(ball);
 }
 
 void Application::Input()
@@ -166,19 +177,43 @@ void Application::Render()
         if (body->shape->GetType() == CIRCLE)
         {
             const CircleShape* circleShape = static_cast<CircleShape*>(body->shape);
-            Graphics::DrawCircle(body->position.x, body->position.y, circleShape->radius, body->rotation, 0xFF00FF00);
+
+            if(!debug && body->texture)
+            {
+                Graphics::DrawTexture(body->position.x, body->position.y, circleShape->radius * 2, circleShape->radius * 2, body->rotation, body->texture);
+            }
+            else
+            {
+                Graphics::DrawCircle(body->position.x, body->position.y, circleShape->radius, body->rotation, 0xFF00FF00);
+            }
         }
 
         if (body->shape->GetType() == BOX)
         {
             const BoxShape* boxShape = static_cast<BoxShape*>(body->shape);
-            Graphics::DrawPolygon(body->position.x, body->position.y, boxShape->worldVertices, 0xFF00FF00);
+
+            if(!debug && body->texture)
+            {
+                Graphics::DrawTexture(body->position.x, body->position.y, boxShape->width, boxShape->height, body->rotation, body->texture);
+            }
+            else
+            {
+                Graphics::DrawPolygon(body->position.x, body->position.y, boxShape->worldVertices, 0xFF00FF00);
+            }
         }
 
         if (body->shape->GetType() == POLYGON)
         {
             const PolygonShape* polygonShape = static_cast<PolygonShape*>(body->shape);
-            Graphics::DrawPolygon(body->position.x, body->position.y, polygonShape->worldVertices, 0xFF00FF00);
+
+            if (!debug)
+            {
+                Graphics::DrawFillPolygon(body->position.x, body->position.y, polygonShape->worldVertices, 0xFF444444);
+            }
+            else
+            {
+                Graphics::DrawPolygon(body->position.x, body->position.y, polygonShape->worldVertices, 0xFF00FF00);
+            }
         }
     }
 
