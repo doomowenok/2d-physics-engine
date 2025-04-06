@@ -9,7 +9,7 @@ World::World(float gravity)
 
 World::~World()
 {
-    for (Body* body: bodies)
+    for(Body* body: bodies)
     {
         delete body;
     }
@@ -20,7 +20,7 @@ void World::AddBody(Body* body)
     bodies.push_back(body);
 }
 
-std::vector<Body*>& World::GetBodies()
+std::vector<Body*> &World::GetBodies()
 {
     return bodies;
 }
@@ -37,47 +37,50 @@ void World::AddTorque(float torque)
 
 void World::Update(float deltaTime)
 {
-    for (Body* body: bodies)
+    for(Body* body: bodies)
     {
         Vec2 weight = Vec2(0.0f, body->mass * gravity * PIXELS_PER_METER);
         body->AddForce(weight);
 
-        for (Vec2 force: forces)
+        for(Vec2 force: forces)
         {
             body->AddForce(force);
         }
 
-        for (float torque: torques)
+        for(float torque: torques)
         {
             body->AddTorque(torque);
         }
     }
 
-    for (Body* body: bodies)
+    for(Body* body: bodies)
     {
         body->Update(deltaTime);
     }
 
-    CheckCollisions();
+    for(int n = 0; n < 10; n++)
+    {
+        CheckCollisions();
+    }
 }
 
 void World::CheckCollisions()
 {
-    for (Body* body: bodies)
+    for(Body* body: bodies)
     {
         body->isColliding = false;
     }
 
-    for (int i = 0; i < bodies.size() - 1; i++)
+    for(int i = 0; i < bodies.size() - 1; i++)
     {
-        for (int j = i + 1; j < bodies.size(); j++)
+        for(int j = i + 1; j < bodies.size(); j++)
         {
             Body* a = bodies[i];
             Body* b = bodies[j];
 
             Contact contact;
 
-            if (CollisionDetection::IsColliding(a, b, contact))
+            if(CollisionDetection::IsColliding(a, b, contact))
             {
                 contact.ResolveCollision();
 
