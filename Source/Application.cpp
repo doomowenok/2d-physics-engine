@@ -2,8 +2,6 @@
 #include "Physics/Constants.h"
 #include "Graphics.h"
 #include "Physics/Force.h"
-#include "Physics/CollisionDetection.h"
-#include "Physics/Contact.h"
 
 bool Application::IsRunning() const
 {
@@ -13,6 +11,7 @@ bool Application::IsRunning() const
 void Application::Setup()
 {
     running = Graphics::OpenWindow();
+    world = new World(-9.8f);
 
     Body* floor = new Body(
         BoxShape(Graphics::Width() - 50, 50),
@@ -21,12 +20,16 @@ void Application::Setup()
         0.0f,
         1.0f,
         0.7f);
+    world->AddBody(floor);
+
     Body* leftWall = new Body(
         BoxShape(50, Graphics::Height() - 100),
         50, Graphics::Height() / 2.0 - 25,
         0.0f,
         0.2f,
         0.7f);
+    world->AddBody(leftWall);
+
     Body* rightWall = new Body(
         BoxShape(50, Graphics::Height() - 100),
         Graphics::Width() - 50,
@@ -34,10 +37,7 @@ void Application::Setup()
         0.0f,
         0.2f,
         0.7f);
-
-    bodies.push_back(floor);
-    bodies.push_back(leftWall);
-    bodies.push_back(rightWall);
+    world->AddBody(rightWall);
 
     Body* bigBox = new Body(
         BoxShape(200, 200),
@@ -47,7 +47,7 @@ void Application::Setup()
         0.2f,
         0.7f);
     bigBox->SetTexture("../Assets/crate.png");
-    bodies.push_back(bigBox);
+    world->AddBody(bigBox);
 
     Body* ball = new Body(
         CircleShape(100),
@@ -57,7 +57,7 @@ void Application::Setup()
         0.2f,
         0.7f);
     ball->SetTexture("../Assets/basketball.png");
-    bodies.push_back(ball);
+    world->AddBody(ball);
 }
 
 void Application::Input()
@@ -92,7 +92,7 @@ void Application::Input()
                     Vec2(40, 20),
                 };
                 Body* polygon = new Body(PolygonShape(vertices), x, y, 2.0f, 0.1f, 0.7f);
-                bodies.push_back(polygon);
+                world->AddBody(polygon);
                 break;
         }
     }
@@ -120,59 +120,12 @@ void Application::Update()
 
     timePreviousFrame = SDL_GetTicks();
 
-    for (Body* body: bodies)
-    {
-        Vec2 weight = Vec2(0.0f, body->mass * 9.8f * PIXELS_PER_METER);
-        body->AddForce(weight);
-
-        // Vec2 wind = Vec2(2.0f, 0.0f) * PIXELS_PER_METER;
-        // body->AddForce(wind);
-
-        // float torque = 0.0f;
-        // body->AddTorque(torque);
-    }
-
-    for (Body* body: bodies)
-    {
-        body->Update(deltaTime);
-    }
-
-    for (Body* body: bodies)
-    {
-        body->isColliding = false;
-    }
-
-    for (int i = 0; i < bodies.size() - 1; i++)
-    {
-        for (int j = i + 1; j < bodies.size(); j++)
-        {
-            Body* a = bodies[i];
-            Body* b = bodies[j];
-
-            Contact contact;
-
-            if (CollisionDetection::IsColliding(a, b, contact))
-            {
-                contact.ResolveCollision();
-
-                a->isColliding = true;
-                b->isColliding = true;
-
-                if (debug)
-                {
-                    Graphics::DrawFillCircle(contact.start.x, contact.start.y, 3, 0xFFFF00FF);
-                    Graphics::DrawFillCircle(contact.end.x, contact.end.y, 3, 0xFFFF00FF);
-                    Graphics::DrawLine(contact.start.x, contact.start.y, contact.start.x + contact.normal.x * 15,
-                                       contact.start.y + contact.normal.y * 15, 0xFFFF00FF);
-                }
-            }
-        }
-    }
+    world->Update(deltaTime);
 }
 
 void Application::Render()
 {
-    for (const Body* body: bodies)
+    for (const Body* body: world->GetBodies())
     {
         if (body->shape->GetType() == CIRCLE)
         {
@@ -222,10 +175,7 @@ void Application::Render()
 
 void Application::Destroy()
 {
-    for (Body* particle: bodies)
-    {
-        delete particle;
-    }
-
     Graphics::CloseWindow();
+
+    delete world;
 }

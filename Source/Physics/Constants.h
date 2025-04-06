@@ -1,8 +1,6 @@
 #pragma once
 
-
-
 const int MILLISECONDS_IN_SECOND = 1000;
-const int FPS = 60;
+const int FPS = 144;
 const int MILLISECONDS_PER_FRAME = MILLISECONDS_IN_SECOND / FPS;
 const int PIXELS_PER_METER = 50;

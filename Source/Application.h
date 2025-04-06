@@ -2,6 +2,7 @@
 
 #include "Graphics.h"
 #include "Physics/Body.h"
+#include "Physics/World.h"
 #include <vector>
 
 class Application
@@ -9,7 +10,7 @@ class Application
 private:
     bool debug = false;
     bool running = false;
-    std::vector<Body *> bodies;
+    World* world;
 
 public:
     Application() = default;
