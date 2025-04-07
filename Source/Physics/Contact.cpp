@@ -7,11 +7,11 @@ void Contact::ResolvePenetration() const
         return;
     }
 
-    float da = depth / (a->inverseMass + b->inverseMass) * a->inverseMass;
-    float db = depth / (a->inverseMass + b->inverseMass) * b->inverseMass;
+    const float da = depth / (a->inverseMass + b->inverseMass) * a->inverseMass;
+    const float db = depth / (a->inverseMass + b->inverseMass) * b->inverseMass;
 
-    a->position -= normal * da * 0.8f;
-    b->position += normal * db * 0.8f;
+    a->position -= normal * da;
+    b->position += normal * db;
 
     a->shape->UpdateVertices(a->rotation, a->position);
     b->shape->UpdateVertices(b->rotation, b->position);
