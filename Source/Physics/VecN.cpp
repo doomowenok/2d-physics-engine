@@ -44,42 +44,84 @@ float VecN::Dot(const VecN& v)
     return dot;
 }
 
-VecN VecN::operator+(const VecN& v)
+VecN& VecN::operator=(const VecN& v)
 {
+    delete[] data;
+    N = v.N;
+    data = new float[N];
 
+    for(int i = 0; i < N; i++)
+    {
+        data[i] = v.data[i];
+    }
+
+    return *this;
 }
 
-VecN VecN::operator-(const VecN& v)
+VecN VecN::operator+(const VecN& v) const
 {
+    VecN result = *this;
 
+    for(int i = 0; i < N; i++)
+    {
+        result.data[i] += v.data[i];
+    }
+
+    return result;
 }
 
-VecN VecN::operator*(float k)
+VecN VecN::operator-(const VecN& v) const
 {
+    VecN result = *this;
 
+    for(int i = 0; i < N; i++)
+    {
+        result.data[i] -= v.data[i];
+    }
+
+    return result;
+}
+
+VecN VecN::operator*(float k) const
+{
+    VecN result = *this;
+    result *= k;
+    return result;
 }
 
 const VecN& VecN::operator+=(const VecN& v)
 {
-
+    for(int i = 0; i < N; i++)
+    {
+        data[i] += v.data[i];
+    }
+    return *this;
 }
 
 const VecN& VecN::operator-=(const VecN& v)
 {
-
+    for(int i = 0; i < N; i++)
+    {
+        data[i] -= v.data[i];
+    }
+    return *this;
 }
 
 const VecN& VecN::operator*=(float k)
 {
-
+    for(int i = 0; i < N; i++)
+    {
+        data[i] *= k;
+    }
+    return *this;
 }
 
-float VecN::operator[](int index) const
+float VecN::operator[](const int index) const
 {
-
+    return data[index];
 }
 
-float& VecN::operator[](int index)
+float& VecN::operator[](const int index)
 {
-
+    return data[index];
 }
