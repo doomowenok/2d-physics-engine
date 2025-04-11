@@ -1,0 +1,3 @@
+/Users/doomowenok/Projects/2d-physics-engine/build/CMakeFiles/2d-physics-engine.dir
+/Users/doomowenok/Projects/2d-physics-engine/build/CMakeFiles/edit_cache.dir
+/Users/doomowenok/Projects/2d-physics-engine/build/CMakeFiles/rebuild_cache.dir
