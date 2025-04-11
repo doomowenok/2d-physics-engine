@@ -54,6 +54,22 @@ void Body::ClearTorque()
     sumTorque = 0.0f;
 }
 
+Vec2 Body::WorldToLocalSpace(const Vec2& point) const
+{
+    const Vec2 translation = point - position;
+    const float rotatedX = cos(-rotation) * translation.x - sin(-rotation) * translation.y;
+    const float rotatedY = cos(-rotation) * translation.y + sin(-rotation) * translation.x;
+    Vec2 result = Vec2(rotatedX, rotatedY);
+    return result;
+}
+
+Vec2 Body::LocalToWorldSpace(const Vec2& point) const
+{
+    const Vec2 rotated = point.Rotate(rotation);
+    Vec2 result = rotated + position;
+    return result;
+}
+
 // Only linear
 void Body::ApplyImpulse(const Vec2& impulse)
 {
