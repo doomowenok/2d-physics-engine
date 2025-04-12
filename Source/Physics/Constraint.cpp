@@ -77,4 +77,12 @@ void JointConstraint::Solve()
 
     const VecN v = GetVelocities();
     const MatMN inverseM = GetInverseM();
+
+    const MatMN jacobianT = jacobian.Transpose();
+
+    VecN rhs = jacobian * v * -1.0f;                // A
+    MatMN lhs = jacobian * inverseM * jacobianT;    // b
+
+    // Ax = b (Gauss Seidel Method)
+    VecN lambda = SolveGaussSeidel(lhs, rhs);
 }
