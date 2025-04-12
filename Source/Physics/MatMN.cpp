@@ -64,7 +64,7 @@ VecN MatMN::SolveGaussSeidel(const MatMN& A, const VecN& b)
     return X;
 }
 
-const MatMN& MatMN::operator=(const MatMN& m)
+const MatMN &MatMN::operator=(const MatMN& m)
 {
     M = m.M;
     N = m.N;
@@ -103,16 +103,14 @@ MatMN MatMN::operator*(const MatMN& m) const
         return m;
     }
 
-    MatMN result = MatMN(M, m.N);
-    MatMN transposed = m.Transpose();
-
+    MatMN tranposed = m.Transpose();
+    MatMN result(M, m.N);
     for(int i = 0; i < M; i++)
     {
-        for(int j = 0; j < N; j++)
+        for(int j = 0; j < m.N; j++)
         {
-            result.rows[i][j] = rows[i].Dot(transposed.rows[j]);
+            result.rows[i][j] = rows[i].Dot(tranposed.rows[j]);
         }
     }
-
     return result;
 }

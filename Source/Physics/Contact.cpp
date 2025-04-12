@@ -24,12 +24,12 @@ void Contact::ResolveCollision() const
     const float elasticity = std::min(a->restitution, b->restitution);
     const float friction = std::min(a->friction, b->friction);
 
-    Vec2 ra = end - a->position;
-    Vec2 rb = start - b->position;
+    const Vec2 ra = end - a->position;
+    const Vec2 rb = start - b->position;
 
     // Linear + Angular velocities
-    Vec2 va = a->velocity + Vec2(-a->angularVelocity * ra.y, a->angularVelocity * ra.x);
-    Vec2 vb = b->velocity + Vec2(-b->angularVelocity * rb.y, b->angularVelocity * rb.x);
+    const Vec2 va = a->velocity + Vec2(-a->angularVelocity * ra.y, a->angularVelocity * ra.x);
+    const Vec2 vb = b->velocity + Vec2(-b->angularVelocity * rb.y, b->angularVelocity * rb.x);
 
     const Vec2 relativeVelocity = va - vb;
 
@@ -38,7 +38,7 @@ void Contact::ResolveCollision() const
     const float impulseNormalMagnitude =
         -(1 + elasticity) * relativeVelocityDotNormal
         / ((a->inverseMass + b->inverseMass) + ra.Cross(normal) * ra.Cross(normal) * a->inverseI + rb.Cross(normal) * rb.Cross(normal) * b->inverseI);
-    Vec2 impulseAlongNormal = impulseNormalDirection * impulseNormalMagnitude;
+    const Vec2 impulseAlongNormal = impulseNormalDirection * impulseNormalMagnitude;
 
     const Vec2 tangent = normal.Normal();
     const float relativeVelocityDotTangent = relativeVelocity.Dot(tangent);
@@ -50,6 +50,6 @@ void Contact::ResolveCollision() const
 
     Vec2 finalImpulse = impulseAlongNormal + impulseAlongTangent;
 
-    a->ApplyImpulse(finalImpulse, ra);
-    b->ApplyImpulse(-finalImpulse, rb);
+    a->ApplyImpulseAtPoint(finalImpulse, ra);
+    b->ApplyImpulseAtPoint(-finalImpulse, rb);
 }

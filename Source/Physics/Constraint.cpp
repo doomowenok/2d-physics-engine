@@ -48,41 +48,46 @@ JointConstraint::JointConstraint(Body* a, Body* b, const Vec2& anchorPoint) : Co
     this->bPoint = b->WorldToLocalSpace(anchorPoint);
 }
 
-JointConstraint::~JointConstraint()
-{
-
-}
-
 void JointConstraint::Solve()
 {
-    const Vec2 pa = a->LocalToWorldSpace(aPoint);
-    const Vec2 pb = b->LocalToWorldSpace(bPoint);
+    Vec2 pa = a->LocalToWorldSpace(aPoint);
+    Vec2 pb = b->LocalToWorldSpace(bPoint);
 
-    const Vec2 ra = pa - a->position;
-    const Vec2 rb = pb - b->position;
+    Vec2 ra = pa - a->position;
+    Vec2 rb = pb - b->position;
 
-    const Vec2 j1 = (pa - pb) * 2.0f;
+    jacobian.Zero();
+
+    Vec2 j1 = (pa - pb) * 2.0f;
     jacobian.rows[0][0] = j1.x; // A - Linear velocity.x
     jacobian.rows[0][1] = j1.y; // A - Linear velocity.y
 
-    const float j2 = ra.Cross(pa - pb) * 2.0f;
+    float j2 = ra.Cross(pa - pb) * 2.0f;
     jacobian.rows[0][2] = j2;   // A - Angular velocity
 
-    const Vec2 j3 = (pb - pa) * 2.0f;
+    Vec2 j3 = (pb - pa) * 2.0f;
     jacobian.rows[0][3] = j3.x; // B - Linear velocity.x
     jacobian.rows[0][4] = j3.y; // B - Linear velocity.y
 
-    const float j4 = rb.Cross(pb - pa) * 2.0f;
+    float j4 = rb.Cross(pb - pa) * 2.0f;
     jacobian.rows[0][5] = j4;   // B - Angular velocity
 
-    const VecN v = GetVelocities();
-    const MatMN inverseM = GetInverseM();
+    VecN v = GetVelocities();
+    MatMN inverseM = GetInverseM();
 
-    const MatMN jacobianT = jacobian.Transpose();
+    MatMN jacobianT = jacobian.Transpose();
 
     VecN rhs = jacobian * v * -1.0f;                // A
     MatMN lhs = jacobian * inverseM * jacobianT;    // b
 
     // Ax = b (Gauss Seidel Method)
     VecN lambda = MatMN::SolveGaussSeidel(lhs, rhs);
+
+    VecN impulses = jacobianT * lambda;
+
+    a->ApplyImpulseLinear(Vec2(impulses[0], impulses[1]));
+    a->ApplyImpulseAngular(impulses[2]);
+
+    b->ApplyImpulseLinear(Vec2(impulses[3], impulses[4]));
+    b->ApplyImpulseAngular(impulses[5]);
 }

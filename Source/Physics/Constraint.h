@@ -29,7 +29,6 @@ private:
 public:
     JointConstraint();
     JointConstraint(Body* a, Body* b, const Vec2& anchorPoint);
-    ~JointConstraint();
     void Solve() override;
 };
 

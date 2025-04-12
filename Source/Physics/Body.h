@@ -46,8 +46,9 @@ struct Body
     Vec2 WorldToLocalSpace(const Vec2& point) const;
     Vec2 LocalToWorldSpace(const Vec2& point) const;
 
-    void ApplyImpulse(const Vec2& impulse);
-    void ApplyImpulse(const Vec2& impulse, const Vec2& r);
+    void ApplyImpulseLinear(const Vec2& impulse);
+    void ApplyImpulseAngular(float impulse);
+    void ApplyImpulseAtPoint(const Vec2& impulse, const Vec2& r);
 
     void IntegrateForces(float deltaTime);
     void IntegrateVelocities(float deltaTime);
