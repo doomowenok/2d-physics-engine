@@ -18,9 +18,9 @@ public:
     MatMN GetInverseM() const;
     VecN GetVelocities() const;
 
-    virtual void PreSolve() { }
-    virtual void Solve() { }
-    virtual void PostSolve() { }
+    virtual void PreSolve(float deltaTime) { }
+    virtual void Solve(float deltaTime) { }
+    virtual void PostSolve(float deltaTime) { }
 };
 
 class JointConstraint : public Constraint
@@ -28,13 +28,14 @@ class JointConstraint : public Constraint
 private:
     MatMN jacobian;
     VecN cachedLambda;
+    float bias;
 
 public:
     JointConstraint();
     JointConstraint(Body* a, Body* b, const Vec2& anchorPoint);
-    void PreSolve() override;
-    void Solve() override;
-    void PostSolve() override;
+    void PreSolve(float deltaTime) override;
+    void Solve(float deltaTime) override;
+    void PostSolve(float deltaTime) override;
 };
 
 class PenetrationConstraint : public Constraint
@@ -43,5 +44,5 @@ private:
     MatMN jacobian;
 
 public:
-    void Solve() override;
+    // void Solve(float deltaTime) override;
 };

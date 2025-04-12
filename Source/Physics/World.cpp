@@ -70,20 +70,20 @@ void World::Update(float deltaTime)
 
     for(Constraint* constraint: constraints)
     {
-        constraint->PreSolve();
+        constraint->PreSolve(deltaTime);
     }
 
     for(int i = 0; i < 5; i++)
     {
         for(Constraint* constraint: constraints)
         {
-            constraint->Solve();
+            constraint->Solve(deltaTime);
         }
     }
 
     for(Constraint* constraint: constraints)
     {
-        constraint->PostSolve();
+        constraint->PostSolve(deltaTime);
     }
 
     for(Body* body: bodies)
