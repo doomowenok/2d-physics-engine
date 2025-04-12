@@ -55,5 +55,26 @@ JointConstraint::~JointConstraint()
 
 void JointConstraint::Solve()
 {
-    Constraint::Solve();
+    const Vec2 pa = a->LocalToWorldSpace(aPoint);
+    const Vec2 pb = b->LocalToWorldSpace(bPoint);
+
+    const Vec2 ra = pa - a->position;
+    const Vec2 rb = pb - b->position;
+
+    const Vec2 j1 = (pa - pb) * 2.0f;
+    jacobian.rows[0][0] = j1.x; // A - Linear velocity.x
+    jacobian.rows[0][1] = j1.y; // A - Linear velocity.y
+
+    const float j2 = ra.Cross(pa - pb) * 2.0f;
+    jacobian.rows[0][2] = j2;   // A - Angular velocity
+
+    const Vec2 j3 = (pb - pa) * 2.0f;
+    jacobian.rows[0][3] = j3.x; // B - Linear velocity.x
+    jacobian.rows[0][4] = j3.y; // B - Linear velocity.y
+
+    const float j4 = rb.Cross(pb - pa) * 2.0f;
+    jacobian.rows[0][5] = j4;   // B - Angular velocity
+
+    const VecN v = GetVelocities();
+    const MatMN inverseM = GetInverseM();
 }
