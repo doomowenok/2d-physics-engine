@@ -84,5 +84,5 @@ void JointConstraint::Solve()
     MatMN lhs = jacobian * inverseM * jacobianT;    // b
 
     // Ax = b (Gauss Seidel Method)
-    VecN lambda = SolveGaussSeidel(lhs, rhs);
+    VecN lambda = MatMN::SolveGaussSeidel(lhs, rhs);
 }

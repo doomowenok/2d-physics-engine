@@ -44,6 +44,26 @@ MatMN MatMN::Transpose() const
     return m;
 }
 
+VecN MatMN::SolveGaussSeidel(const MatMN& A, const VecN& b)
+{
+    const int N = b.N;
+    VecN X(N);
+    X.Zero();
+
+    for(int iterations = 0; iterations < N; iterations++)
+    {
+        for(int i = 0; i < N; i++)
+        {
+            if(A.rows[i][i] != 0.0f)
+            {
+                X[i] += (b[i] / A.rows[i][i] - (A.rows[i].Dot(X) / A.rows[i][i]));
+            }
+        }
+    }
+
+    return X;
+}
+
 const MatMN& MatMN::operator=(const MatMN& m)
 {
     M = m.M;
