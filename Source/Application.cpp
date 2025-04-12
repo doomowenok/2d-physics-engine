@@ -13,32 +13,45 @@ void Application::Setup()
     running = Graphics::OpenWindow();
     world = new World(-9.8f);
 
-    Body* a = new Body(CircleShape(30), Graphics::Width() / 2.0f, Graphics::Height() / 2.0f, 0.0f, 0.3f, 0.3f);
-    Body* b = new Body(CircleShape(20), a->position.x - 100, a->position.y, 1.0f, 0.3f, 0.3f);
+    for(int i = 0; i < 7; i++)
+    {
+        float mass = i == 0 ? 0.0f : 1.0f;
 
-    JointConstraint* constraint = new JointConstraint(a, b, a->position);
+        Body* body = new Body(
+            BoxShape(30, 30),
+            Graphics::Width() / 2.0f - (i * 40),
+            100,
+            mass,
+            0.5f,
+            0.5f);
+        world->AddBody(body);
+    }
 
-    world->AddBody(a);
-    world->AddBody(b);
-    world->AddConstraint(constraint);
+    for(int i = 0; i < world->GetBodies().size() - 1; i++)
+    {
+        Body* a = world->GetBodies()[i];
+        Body* b = world->GetBodies()[i + 1];
+        Constraint* joint = new JointConstraint(a, b, a->position);
+        world->AddConstraint(joint);
+    }
 }
 
 void Application::Input()
 {
     SDL_Event event;
-    while (SDL_PollEvent(&event))
+    while(SDL_PollEvent(&event))
     {
-        switch (event.type)
+        switch(event.type)
         {
             case SDL_QUIT:
                 running = false;
                 break;
             case SDL_KEYDOWN:
-                if (event.key.keysym.sym == SDLK_ESCAPE)
+                if(event.key.keysym.sym == SDLK_ESCAPE)
                 {
                     running = false;
                 }
-                if (event.key.keysym.sym == SDLK_d)
+                if(event.key.keysym.sym == SDLK_d)
                 {
                     debug = !debug;
                 }
@@ -69,14 +82,14 @@ void Application::Update()
 
     int timeToWait = MILLISECONDS_PER_FRAME - (SDL_GetTicks() - timePreviousFrame);
 
-    if (timeToWait > 0)
+    if(timeToWait > 0)
     {
         SDL_Delay(timeToWait);
     }
 
     float deltaTime = (float) (SDL_GetTicks() - timePreviousFrame) / MILLISECONDS_IN_SECOND;
 
-    if (deltaTime > 0.016)
+    if(deltaTime > 0.016)
     {
         deltaTime = 0.016;
     }
@@ -88,29 +101,42 @@ void Application::Update()
 
 void Application::Render()
 {
-    for (const Body* body: world->GetBodies())
+    if(debug)
     {
-        if (body->shape->GetType() == CIRCLE)
+        for(Constraint* constraint: world->GetConstraints())
+        {
+            const Vec2 pa = constraint->a->LocalToWorldSpace(constraint->aPoint);
+            const Vec2 pb = constraint->b->LocalToWorldSpace(constraint->aPoint);
+            Graphics::DrawLine(pa.x, pa.y, pb.x, pb.y, 0xFF0000FF);
+        }
+    }
+
+    for(const Body* body: world->GetBodies())
+    {
+        if(body->shape->GetType() == CIRCLE)
         {
             const CircleShape* circleShape = static_cast<CircleShape*>(body->shape);
 
             if(!debug && body->texture)
             {
-                Graphics::DrawTexture(body->position.x, body->position.y, circleShape->radius * 2, circleShape->radius * 2, body->rotation, body->texture);
+                Graphics::DrawTexture(body->position.x, body->position.y, circleShape->radius * 2,
+                                      circleShape->radius * 2, body->rotation, body->texture);
             }
             else
             {
-                Graphics::DrawCircle(body->position.x, body->position.y, circleShape->radius, body->rotation, 0xFF00FF00);
+                Graphics::DrawCircle(body->position.x, body->position.y, circleShape->radius, body->rotation,
+                                     0xFF00FF00);
             }
         }
 
-        if (body->shape->GetType() == BOX)
+        if(body->shape->GetType() == BOX)
         {
             const BoxShape* boxShape = static_cast<BoxShape*>(body->shape);
 
             if(!debug && body->texture)
             {
-                Graphics::DrawTexture(body->position.x, body->position.y, boxShape->width, boxShape->height, body->rotation, body->texture);
+                Graphics::DrawTexture(body->position.x, body->position.y, boxShape->width, boxShape->height,
+                                      body->rotation, body->texture);
             }
             else
             {
@@ -118,11 +144,11 @@ void Application::Render()
             }
         }
 
-        if (body->shape->GetType() == POLYGON)
+        if(body->shape->GetType() == POLYGON)
         {
             const PolygonShape* polygonShape = static_cast<PolygonShape*>(body->shape);
 
-            if (!debug)
+            if(!debug)
             {
                 Graphics::DrawFillPolygon(body->position.x, body->position.y, polygonShape->worldVertices, 0xFF444444);
             }

@@ -20,6 +20,7 @@ Body::Body(const Shape& shape, float x, float y, float mass, float restitution, 
     this->inverseI = I == 0.0f ? 0.0f : 1.0f / I;
     this->restitution = restitution;
     this->friction = friction;
+    this->shape->UpdateVertices(this->rotation, this->position);
 }
 
 Body::~Body()
