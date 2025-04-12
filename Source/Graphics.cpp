@@ -25,9 +25,10 @@ bool Graphics::OpenWindow()
     }
     SDL_DisplayMode display_mode;
     SDL_GetCurrentDisplayMode(0, &display_mode);
-    windowWidth = display_mode.w;
-    windowHeight = display_mode.h;
-    window = SDL_CreateWindow(NULL, 0, 0, windowWidth, windowHeight, SDL_WINDOW_BORDERLESS);
+    windowWidth = display_mode.w / 2;
+    windowHeight = display_mode.h / 2;
+
+    window = SDL_CreateWindow("Physics Engine Debug", windowWidth / 2, windowHeight / 2, windowWidth, windowHeight, SDL_WINDOW_SHOWN);
     if (!window)
     {
         std::cerr << "Error creating SDL window" << std::endl;
