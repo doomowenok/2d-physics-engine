@@ -13,51 +13,58 @@ void Application::Setup()
     running = Graphics::OpenWindow();
     world = new World(-9.8f);
 
-    Body* floor = new Body(
-        BoxShape(Graphics::Width() - 50, 50),
-        Graphics::Width() / 2.0,
-        Graphics::Height() - 50,
-        0.0f,
-        1.0f,
-        0.7f);
-    world->AddBody(floor);
+    Body* a = new Body(CircleShape(30), Graphics::Width() / 2.0f, Graphics::Height() / 2.0f, 0.0f, 0.3f, 0.3f);
+    Body* b = new Body(CircleShape(20), a->position.x - 100, a->position.y, 1.0f, 0.3f, 0.3f);
 
-    Body* leftWall = new Body(
-        BoxShape(50, Graphics::Height() - 100),
-        50, Graphics::Height() / 2.0 - 25,
-        0.0f,
-        0.2f,
-        0.7f);
-    world->AddBody(leftWall);
+    Constraint* constraint = new JointConstraint(a, b, a->position);
 
-    Body* rightWall = new Body(
-        BoxShape(50, Graphics::Height() - 100),
-        Graphics::Width() - 50,
-        Graphics::Height() / 2.0 - 25,
-        0.0f,
-        0.2f,
-        0.7f);
-    world->AddBody(rightWall);
+    world->AddBody(a);
+    world->AddBody(b);
+    world->AddConstraint(constraint);
 
-    Body* bigBox = new Body(
-        BoxShape(200, 200),
-        Graphics::Width() / 2.0,
-        Graphics::Height() / 2.0,
-        0.0f,
-        0.2f,
-        0.7f);
-    bigBox->SetTexture("../Assets/crate.png");
-    world->AddBody(bigBox);
-
-    Body* ball = new Body(
-        CircleShape(100),
-        Graphics::Width() / 2.0 + 400,
-        Graphics::Height() / 2.0 + 100,
-        0.0f,
-        0.2f,
-        0.7f);
-    ball->SetTexture("../Assets/basketball.png");
-    world->AddBody(ball);
+    // Body* floor = new Body(
+    //     BoxShape(Graphics::Width() - 50, 50),
+    //     Graphics::Width() / 2.0,
+    //     Graphics::Height() - 50,
+    //     0.0f,
+    //     1.0f,
+    //     0.7f);
+    // world->AddBody(floor);
+    //
+    // Body* leftWall = new Body(
+    //     BoxShape(50, Graphics::Height() - 100),
+    //     50, Graphics::Height() / 2.0 - 25,
+    //     0.0f,
+    //     0.2f,
+    //     0.7f);
+    // world->AddBody(leftWall);
+    //
+    // Body* rightWall = new Body(
+    //     BoxShape(50, Graphics::Height() - 100),
+    //     Graphics::Width() - 50,
+    //     Graphics::Height() / 2.0 - 25,
+    //     0.0f,
+    //     0.2f,
+    //     0.7f);
+    // world->AddBody(rightWall);
+    //
+    // Body* bigBox = new Body(
+    //     BoxShape(200, 200),
+    //     Graphics::Width() / 2.0,
+    //     Graphics::Height() / 2.0,
+    //     0.0f,
+    //     0.2f,
+    //     0.7f);
+    // world->AddBody(bigBox);
+    //
+    // Body* ball = new Body(
+    //     CircleShape(100),
+    //     Graphics::Width() / 2.0 + 400,
+    //     Graphics::Height() / 2.0 + 100,
+    //     0.0f,
+    //     0.2f,
+    //     0.7f);
+    // world->AddBody(ball);
 }
 
 void Application::Input()

@@ -2,7 +2,7 @@
 #include "CollisionDetection.h"
 #include "Constants.h"
 
-World::World(float gravity)
+World::World(const float gravity)
 {
     this->gravity = -gravity;
 }
@@ -23,6 +23,16 @@ void World::AddBody(Body* body)
 std::vector<Body*> &World::GetBodies()
 {
     return bodies;
+}
+
+void World::AddConstraint(Constraint* constraint)
+{
+    constraints.push_back(constraint);
+}
+
+std::vector<Constraint*>& World::GetConstraints()
+{
+    return constraints;
 }
 
 void World::AddForce(const Vec2& force)
@@ -55,7 +65,17 @@ void World::Update(float deltaTime)
 
     for(Body* body: bodies)
     {
-        body->Update(deltaTime);
+        body->IntegrateForces(deltaTime);
+    }
+
+    for(Constraint* constraint: constraints)
+    {
+        constraint->Solve();
+    }
+
+    for(Body* body: bodies)
+    {
+        body->IntegrateVelocities(deltaTime);
     }
 
     CheckCollisions();

@@ -49,10 +49,6 @@ struct Body
     void ApplyImpulse(const Vec2& impulse);
     void ApplyImpulse(const Vec2& impulse, const Vec2& r);
 
-    void IntegrateLinear(float deltaTime);
-    void IntegrateAngular(float deltaTime);
-
-    void Update(float deltaTime);
-
-    void SetTexture(const char* textureFileName);
+    void IntegrateForces(float deltaTime);
+    void IntegrateVelocities(float deltaTime);
 };

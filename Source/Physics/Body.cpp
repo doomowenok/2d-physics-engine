@@ -93,47 +93,32 @@ void Body::ApplyImpulse(const Vec2& impulse, const Vec2& r)
     angularVelocity += r.Cross(impulse) * inverseI;
 }
 
-void Body::IntegrateLinear(float deltaTime)
+void Body::IntegrateForces(const float deltaTime)
 {
     if(IsStatic())
     {
         return;
     }
 
-    // acceleration = sumForces / mass;
     acceleration = sumForces * inverseMass;
-
     velocity += acceleration * deltaTime;
-    position += velocity * deltaTime;
+
+    angularAcceleration = sumTorque * inverseI;
+    angularVelocity += angularAcceleration * deltaTime;
 
     ClearForces();
-}
-
-void Body::IntegrateAngular(float deltaTime)
-{
-    // angularAcceleration = sumTorque / I;
-    angularAcceleration = sumTorque * inverseI;
-
-    angularVelocity += angularAcceleration * deltaTime;
-    rotation += angularVelocity * deltaTime;
-
     ClearTorque();
 }
 
-void Body::Update(float deltaTime)
+void Body::IntegrateVelocities(const float deltaTime)
 {
-    IntegrateLinear(deltaTime);
-    IntegrateAngular(deltaTime);
-    shape->UpdateVertices(rotation, position);
-}
-
-void Body::SetTexture(const char* textureFileName)
-{
-    SDL_Surface* surface = IMG_Load(textureFileName);
-
-    if(surface)
+    if(IsStatic())
     {
-        texture = SDL_CreateTextureFromSurface(Graphics::renderer, surface);
-        SDL_FreeSurface(surface);
+        return;
     }
+
+    position += velocity * deltaTime;
+    rotation += angularVelocity * deltaTime;
+
+    shape->UpdateVertices(rotation, position);
 }
