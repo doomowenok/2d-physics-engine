@@ -1,4 +1,5 @@
 #include "MatMN.h"
+
 MatMN::MatMN() : M(0), N(0) { }
 
 MatMN::MatMN(int m, int n) : M(m), N(n)

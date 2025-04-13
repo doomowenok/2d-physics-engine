@@ -28,6 +28,4 @@ public:
     void AddTorque(float torque);
 
     void Update(float deltaTime);
-
-    void CheckCollisions();
 };

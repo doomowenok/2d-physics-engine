@@ -9,6 +9,11 @@ World::World(const float gravity)
 
 World::~World()
 {
+    for(Constraint* constraint: constraints)
+    {
+        delete constraint;
+    }
+
     for(Body* body: bodies)
     {
         delete body;
@@ -47,6 +52,8 @@ void World::AddTorque(float torque)
 
 void World::Update(float deltaTime)
 {
+    std::vector<PenetrationConstraint> penetrations;
+
     for(Body* body: bodies)
     {
         Vec2 weight = Vec2(0.0f, body->mass * gravity * PIXELS_PER_METER);
@@ -68,39 +75,6 @@ void World::Update(float deltaTime)
         body->IntegrateForces(deltaTime);
     }
 
-    for(Constraint* constraint: constraints)
-    {
-        constraint->PreSolve(deltaTime);
-    }
-
-    for(int i = 0; i < 5; i++)
-    {
-        for(Constraint* constraint: constraints)
-        {
-            constraint->Solve(deltaTime);
-        }
-    }
-
-    for(Constraint* constraint: constraints)
-    {
-        constraint->PostSolve(deltaTime);
-    }
-
-    for(Body* body: bodies)
-    {
-        body->IntegrateVelocities(deltaTime);
-    }
-
-    CheckCollisions();
-}
-
-void World::CheckCollisions()
-{
-    for(Body* body: bodies)
-    {
-        body->isColliding = false;
-    }
-
     for(int i = 0; i < bodies.size() - 1; i++)
     {
         for(int j = i + 1; j < bodies.size(); j++)
@@ -112,11 +86,47 @@ void World::CheckCollisions()
 
             if(CollisionDetection::IsColliding(a, b, contact))
             {
-                contact.ResolveCollision();
-
-                a->isColliding = true;
-                b->isColliding = true;
+                PenetrationConstraint penetration = PenetrationConstraint(contact.a, contact.b, contact.start, contact.end, contact.normal);
+                penetrations.push_back(penetration);
             }
         }
+    }
+
+    for(Constraint* constraint: constraints)
+    {
+        constraint->PreSolve(deltaTime);
+    }
+
+    for(PenetrationConstraint& constraint: penetrations)
+    {
+        constraint.PreSolve(deltaTime);
+    }
+
+    for(int i = 0; i < 5; i++)
+    {
+        for(Constraint* constraint: constraints)
+        {
+            constraint->Solve(deltaTime);
+        }
+
+        for(PenetrationConstraint& constraint: penetrations)
+        {
+            constraint.Solve(deltaTime);
+        }
+    }
+
+    for(Constraint* constraint: constraints)
+    {
+        constraint->PostSolve(deltaTime);
+    }
+
+    for(PenetrationConstraint& constraint: penetrations)
+    {
+        constraint.PostSolve(deltaTime);
+    }
+
+    for(Body* body: bodies)
+    {
+        body->IntegrateVelocities(deltaTime);
     }
 }
