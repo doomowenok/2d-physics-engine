@@ -9,14 +9,14 @@ World::World(const float gravity)
 
 World::~World()
 {
-    for(Constraint* constraint: constraints)
-    {
-        delete constraint;
-    }
-
     for(Body* body: bodies)
     {
         delete body;
+    }
+
+    for(Constraint* constraint: constraints)
+    {
+        delete constraint;
     }
 }
 

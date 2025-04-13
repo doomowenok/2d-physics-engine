@@ -166,13 +166,12 @@ void PenetrationConstraint::PreSolve(const float deltaTime)
     jacobian.rows[0][5] = j4;   // B - Angular velocity
 
     MatMN jacobianT = jacobian.Transpose();
-    // VecN impulses = jacobianT * cachedLambda;
-    //
-    // a->ApplyImpulseLinear(Vec2(impulses[0], impulses[1]));
-    // a->ApplyImpulseAngular(impulses[2]);
-    //
-    // b->ApplyImpulseLinear(Vec2(impulses[3], impulses[4]));
-    // b->ApplyImpulseAngular(impulses[5]);
+    VecN impulses = jacobianT * cachedLambda;
+
+    a->ApplyImpulseLinear(Vec2(impulses[0], impulses[1]));
+    a->ApplyImpulseAngular(impulses[2]);
+    b->ApplyImpulseLinear(Vec2(impulses[3], impulses[4]));
+    b->ApplyImpulseAngular(impulses[5]);
 
     const float beta = 0.2f;
     float C = (pb - pa).Dot(-n);
@@ -193,7 +192,11 @@ void PenetrationConstraint::Solve(float deltaTime)
 
     // Ax = b (Gauss Seidel Method)
     VecN lambda = MatMN::SolveGaussSeidel(lhs, rhs);
-    // cachedLambda += lambda;
+
+    const VecN oldLambda = cachedLambda;
+    cachedLambda += lambda;
+    cachedLambda[0] = (cachedLambda[0] < 0.0f) ? 0.0f : cachedLambda[0];
+    lambda = cachedLambda - oldLambda;
 
     VecN impulses = jacobianT * lambda;
 
