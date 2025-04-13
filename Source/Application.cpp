@@ -2,6 +2,7 @@
 #include "Physics/Constants.h"
 #include "Graphics.h"
 #include "Physics/Force.h"
+#include <vector>
 
 bool Application::IsRunning() const
 {

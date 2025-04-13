@@ -191,7 +191,14 @@ void PenetrationConstraint::PreSolve(const float deltaTime)
     const float beta = 0.2f;
     float C = (pb - pa).Dot(-n);
     C = std::min(0.0f, C + 0.01f);
-    bias = (beta / deltaTime) * C;
+
+    Vec2 va = a->velocity + Vec2(-(a->angularVelocity) * ra.y, a->angularVelocity * ra.x);
+    Vec2 vb = b->velocity + Vec2(-(b->angularVelocity) * rb.y, b->angularVelocity * rb.x);
+
+    float relativeVelocityDotNormal = (va - vb).Dot(n);
+    float e = std::min(a->restitution, b->restitution);
+
+    bias = (beta / deltaTime) * C + e * relativeVelocityDotNormal;
 }
 
 void PenetrationConstraint::Solve(float deltaTime)
