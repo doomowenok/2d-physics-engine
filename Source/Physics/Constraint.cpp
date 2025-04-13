@@ -119,7 +119,7 @@ void JointConstraint::PostSolve(float deltaTime)
     Constraint::PostSolve(deltaTime);
 }
 
-PenetrationConstraint::PenetrationConstraint() : Constraint(), jacobian(1, 6), cachedLambda(1), bias(0.0f)
+PenetrationConstraint::PenetrationConstraint() : Constraint(), jacobian(2, 6), cachedLambda(2), bias(0.0f), friction(0.0f)
 {
     cachedLambda.Zero();
 }
@@ -129,7 +129,7 @@ PenetrationConstraint::PenetrationConstraint(
     Body* b,
     const Vec2& aCollisionPoint,
     const Vec2& bCollisionPoint,
-    const Vec2& collisionNormal) : Constraint(), jacobian(1, 6), cachedLambda(1), bias(0.0f)
+    const Vec2& collisionNormal) : Constraint(), jacobian(2, 6), cachedLambda(2), bias(0.0f), friction(0.0f)
 {
     this->a = a;
     this->b = b;
@@ -164,6 +164,21 @@ void PenetrationConstraint::PreSolve(const float deltaTime)
 
     float j4 = rb.Cross(n);
     jacobian.rows[0][5] = j4;   // B - Angular velocity
+
+    friction = std::max(a->friction, b->friction);
+
+    if(friction > 0.0f)
+    {
+        Vec2 t = n.Normal();
+
+        jacobian.rows[1][0] = -t.x;
+        jacobian.rows[1][1] = -t.y;
+        jacobian.rows[1][2] = (-ra).Cross(t);
+
+        jacobian.rows[1][3] = t.x;
+        jacobian.rows[1][4] = t.y;
+        jacobian.rows[1][5] = rb.Cross(t);
+    }
 
     MatMN jacobianT = jacobian.Transpose();
     VecN impulses = jacobianT * cachedLambda;

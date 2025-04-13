@@ -44,8 +44,8 @@ private:
     MatMN jacobian;
     VecN cachedLambda;
     float bias;
-
     Vec2 collisionNormal;
+    float friction;
 
 public:
     PenetrationConstraint();
