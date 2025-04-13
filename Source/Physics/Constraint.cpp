@@ -211,6 +211,13 @@ void PenetrationConstraint::Solve(float deltaTime)
     const VecN oldLambda = cachedLambda;
     cachedLambda += lambda;
     cachedLambda[0] = (cachedLambda[0] < 0.0f) ? 0.0f : cachedLambda[0];
+
+    if(friction > 0.0f)
+    {
+        const float maxFriction = cachedLambda[0] * friction;
+        cachedLambda[1] = std::clamp(cachedLambda[1], -maxFriction, maxFriction);
+    }
+
     lambda = cachedLambda - oldLambda;
 
     VecN impulses = jacobianT * lambda;
